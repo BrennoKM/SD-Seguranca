@@ -10,20 +10,28 @@ import ServidorInterface.ServidorAutentificacao;
 public class ImplServidorAutentificacao implements ServidorAutentificacao {
 	private ContaManager bd_contas;
 	private BigInteger chavePubRSA, chavePrivRSA;
-	private String chaveAES = "chaveAESdobd1234", chaveAES_GateAuth = "chaveAESgateauth",
+	private String chaveAESbd = "chaveAESdobd1234", chaveAES_GateAuth = "chaveAESgateauth",
 			mensagemPrivada = "EstouAutentificado";
 	private Cifrador cifrador;
 
 	public ImplServidorAutentificacao() throws Exception {
-		this.bd_contas = new ContaManager(chaveAES);
+		this.bd_contas = new ContaManager(chaveAESbd);
 		cifrador = new Cifrador(chaveAES_GateAuth);
+	}
+	
+	private boolean autentificar(String mensagem) {
+		if (mensagem.equals(mensagemPrivada)) {
+			return true;
+		} else {
+			System.out.println("\t\t\tAutentificação -> Cliente não autentificado!!");
+		}
+		return false;
 	}
 
 	public Conta fazerLogin(String mensagem, Conta conta) throws Exception {
-//		System.out.println("Conta recebida auth: " + conta);
+		mensagem = cifrador.descriptografar(mensagem);
 		conta = cifrador.descriptografar(chaveAES_GateAuth, conta);
-//		System.out.println("Conta descrip auth: " + conta);
-		if (cifrador.descriptografar(mensagem).equals(mensagemPrivada)) {
+		if (autentificar(mensagem)) {
 			String email = conta.getEmail();
 			String senha = conta.getSenha();
 			Conta contaBusca = bd_contas.buscarConta(email);
@@ -34,23 +42,25 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 			}
 			System.out.println("\t\t\tAutentificação -> Falha no Login! " + conta);
 			return null;
-		} else {
-			System.out.println("\t\t\tAutentificação -> Cliente não autentificado!!");
 		}
 		return null;
 	}
 
 	public Conta fazerCadastro(String mensagem, Conta conta) throws Exception {
-		if (cifrador.descriptografar(mensagem).equals(mensagemPrivada)) {
+		mensagem = cifrador.descriptografar(mensagem);
+		if (autentificar(mensagem)) {
 			conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
-			conta = bd_contas.adicionarConta(conta.getEmail(), conta);
-			if (conta == null) {
-				System.out.println("\t\t\tAutentificação -> Falha no cadastro! " + conta);
+			Conta contaCadastrada = bd_contas.adicionarConta(conta.getEmail(), conta);
+			if (contaCadastrada != null) {
+				System.out.println("\t\t\tAutentificação -> Cadastrado com sucesso! " + contaCadastrada);
+				contaCadastrada = cifrador.criptografar(cifrador.getChaveAES(), contaCadastrada);
+//				bd_contas.salvarLista();
+//				bd_contas.carregarLista();
+				return contaCadastrada;
 			}
-			return conta;
-		} else {
-			System.out.println("\t\t\tAutentificação -> Cliente não autentificado!!");
+			
 		}
+		System.out.println("\t\t\tAutentificação -> Falha no cadastro!");
 		return null;
 	}
 
@@ -59,9 +69,11 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 		if (conta != null) {
 			conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
 			bd_contas.removerConta(conta.getEmail());
-			return null;
+//			bd_contas.salvarLista();
+//			bd_contas.carregarLista();
+			return conta;
 		}
-		return conta;
+		return null;
 	}
 
 	public BigInteger getChavePubRSA() {

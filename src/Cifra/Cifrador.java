@@ -144,6 +144,7 @@ public class Cifrador {
 	}
 
 	public Veiculo criptografar(String chaveAES, Veiculo veiculo) throws Exception {
+//		System.out.println("Veiculo pra criptografar: " + veiculo);
 		if (veiculo != null) {
 			veiculo.setRenavam(criptografar(chaveAES, veiculo.getRenavam()));
 			
@@ -171,6 +172,7 @@ public class Cifrador {
 	}
 
 	public Veiculo descriptografar(String chaveAES, Veiculo veiculo) throws Exception {
+//		System.out.println("Veiculo pra descriptografar: " + veiculo);
 		if (veiculo != null) {
 			veiculo.setRenavam(descriptografar(chaveAES, veiculo.getRenavam()));
 			

@@ -101,7 +101,7 @@ public class Conta implements Serializable{
 	}
 	
 	public String toString() {
-        return "Conta{" +
+        return "Conta[" +
                 "nome=" + this.nome +
                 ", cpf=" + this.cpf +
                 ", email=" + this.email +
@@ -110,7 +110,7 @@ public class Conta implements Serializable{
                 ", telefone=" + this.telefone +
                 ", saldo=" + this.saldo +
                 ", tipoConta=" +this.tipoConta +
-                '}';
+                ']';
     }
 	
 	public static void main(String[] args) {

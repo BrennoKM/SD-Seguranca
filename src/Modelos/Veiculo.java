@@ -1,6 +1,13 @@
 package Modelos;
 
-public abstract class Veiculo {
+import java.io.Serializable;
+
+import Modelos.Categorias.Economico;
+import Modelos.Categorias.Executivo;
+import Modelos.Categorias.Intermediario;
+
+public abstract class Veiculo implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String renavam, modelo, ano, preco, emailDono;
 	private Categoria categoria;
 
@@ -14,6 +21,34 @@ public abstract class Veiculo {
 		this.ano = ano;
 		this.preco = preco;
 		this.categoria = categoria;
+	}
+
+	public Veiculo(Veiculo veiculo, Categoria categoria) {
+		this.renavam = veiculo.getRenavam();
+		this.modelo = veiculo.getModelo();
+		this.ano = veiculo.getAno();
+		this.preco = veiculo.getPreco();
+		this.categoria = categoria;
+	}
+
+	public Veiculo(Veiculo veiculo) {
+		this.renavam = veiculo.getRenavam();
+		this.modelo = veiculo.getModelo();
+		this.ano = veiculo.getAno();
+		this.preco = veiculo.getPreco();
+		this.categoria = veiculo.getCategoria();
+	}
+
+	public static Veiculo newVeiculo(Veiculo veiculo) {
+		Categoria categoria = veiculo.getCategoria();
+		if (categoria == Categoria.INTERMEDIÁRIO) {
+			return new Intermediario(veiculo);
+		} else if (categoria == Categoria.ECONÔMICO) {
+			return new Economico(veiculo);
+		} else if (categoria == Categoria.EXECUTIVO) {
+			return new Executivo(veiculo);
+		}
+		return null;
 	}
 
 	public String getRenavam() {
@@ -65,8 +100,8 @@ public abstract class Veiculo {
 	}
 
 	public String toString() {
-		return "Veiculo [renavam=" + renavam + ", modelo=" + modelo + ", ano=" + ano + ", preco=" + preco
-				+ ", categoria=" + categoria + ", emailDono=" + emailDono + "]";
+		return "Veiculo [renavam=" + renavam + ",	modelo=" + modelo + ",	ano=" + ano + ",	preco=" + preco
+				+ ",	categoria=" + categoria + ",	emailDono=" + emailDono + "]";
 	}
-	
+
 }

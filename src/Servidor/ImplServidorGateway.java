@@ -144,8 +144,4 @@ public class ImplServidorGateway implements ServidorGateway {
 		this.clienteChave.put(nomeCliente, chaveAES);
 	}
 
-	public static void main(String[] args) throws Exception {
-		ImplServidorGateway gt = new ImplServidorGateway();
-	}
-
 }
