@@ -217,8 +217,8 @@ public class Cifrador {
 
 	public static void main(String[] args) throws Exception {
 		Cifrador c = new Cifrador();
-		String mensagem = "CSIzMfEMKK4iT32h6MpYIw==";
-		System.out.println(c.descriptografar("chaveAESdobd1234", mensagem));
+		String mensagem = "f9GPpeK9TpfPUdNSBPdtt3Pe2qywugzViOey/JZxnGI=";
+		System.out.println(c.descriptografar("chaveAESgateauth", mensagem));
 	}
 
 }

@@ -1,7 +1,5 @@
 package Servidor;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 import BancoDeDados.VeiculoManager;
@@ -109,8 +107,6 @@ public class ImplServidorLoja implements ServidorLoja {
 			if (veiculoAdicionado != null) {
 				System.out.println("\t\t\tLoja -> Veiculo adicionado: " + veiculoAdicionado);
 				veiculoAdicionado = cifrador.criptografar(chaveAES_GateLoja, veiculoAdicionado);
-//				bd_veiculos.salvarLista();
-//				bd_veiculos.carregarLista();
 				return veiculoAdicionado;
 			}
 		}
@@ -126,8 +122,6 @@ public class ImplServidorLoja implements ServidorLoja {
 			if (veiculoAtualizado != null) {
 				System.out.println("\t\t\tLoja -> Veiculo atualizado: " + veiculoAtualizado);
 				veiculoAtualizado = cifrador.criptografar(chaveAES_GateLoja, veiculoAtualizado);
-//				bd_veiculos.salvarLista();
-//				bd_veiculos.carregarLista();
 				return veiculoAtualizado;
 			}
 		}
@@ -143,8 +137,6 @@ public class ImplServidorLoja implements ServidorLoja {
 			if (veiculoRemovido != null) {
 				System.out.println("\t\t\tLoja -> Veiculo removido: " + veiculoRemovido);
 				veiculoRemovido = cifrador.criptografar(chaveAES_GateLoja, veiculoRemovido);
-//				bd_veiculos.salvarLista();
-//				bd_veiculos.carregarLista();
 				return veiculoRemovido;
 			}
 		}
@@ -154,21 +146,21 @@ public class ImplServidorLoja implements ServidorLoja {
 
 	public Veiculo atribuirDono(String mensagem, Veiculo veiculo, String emailDono) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
-		veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
-		emailDono = cifrador.descriptografar(emailDono);
-		veiculo.setEmailDono(emailDono);
 		if (autentificar(mensagem)) {
+			veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
+			emailDono = cifrador.descriptografar(emailDono);
+			veiculo.setEmailDono(emailDono);
+			
+			
 			Veiculo veiculoNovoDono = bd_veiculos.atualizarVeiculo(veiculo.getRenavam(), veiculo);
+//			veiculoNovoDono = cifrador.descriptografar(chaveAES_GateLoja, veiculoNovoDono);
+
 			if (veiculoNovoDono != null) {
 				System.out.println("\t\t\tLoja -> Veiculo comprado: " + veiculoNovoDono);
-				
-//				bd_veiculos.carregarLista();
-//				bd_veiculos.salvarLista();
-//				bd_veiculos.carregarLista();
-//				Thread.sleep(1000);
-//				veiculoNovoDono = cifrador.criptografar(chaveAES_GateLoja, veiculoNovoDono);
+				veiculoNovoDono = cifrador.criptografar(chaveAES_GateLoja, veiculoNovoDono);
 				return veiculoNovoDono;
 			}
+
 		}
 		System.out.println("\t\t\tLoja -> Veiculo não foi comprado!!");
 		return null;

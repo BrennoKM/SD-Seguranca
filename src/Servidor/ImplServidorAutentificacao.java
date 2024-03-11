@@ -1,7 +1,5 @@
 package Servidor;
 
-import java.math.BigInteger;
-
 import BancoDeDados.ContaManager;
 import Cifra.Cifrador;
 import Modelos.Conta;
@@ -9,7 +7,6 @@ import ServidorInterface.ServidorAutentificacao;
 
 public class ImplServidorAutentificacao implements ServidorAutentificacao {
 	private ContaManager bd_contas;
-	private BigInteger chavePubRSA, chavePrivRSA;
 	private String chaveAESbd = "chaveAESdobd1234", chaveAES_GateAuth = "chaveAESgateauth",
 			mensagemPrivada = "EstouAutentificado";
 	private Cifrador cifrador;
@@ -63,6 +60,46 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 		System.out.println("\t\t\tAutentificação -> Falha no cadastro!");
 		return null;
 	}
+	
+	public Conta buscarConta(String mensagem, String email) throws Exception {
+//		System.out.println("mensagem authrecebida: "+ mensagem);
+		mensagem = cifrador.descriptografar(mensagem);
+//		System.out.println("mensagem descrip: "+ mensagem);
+		if (autentificar(mensagem)) {
+			email = cifrador.descriptografar(cifrador.getChaveAES(), email);
+			Conta contaBusca = bd_contas.buscarConta(email);
+			if (contaBusca != null) {
+				System.out.println("\t\t\tAutentificação -> Conta encontrada: " + contaBusca);
+				contaBusca = cifrador.criptografar(cifrador.getChaveAES(), contaBusca);
+//				bd_contas.salvarLista();
+//				bd_contas.carregarLista();
+				return contaBusca;
+			}
+			
+		}
+		System.out.println("\t\t\tAutentificação -> Falha no cadastro!");
+		return null;
+	}
+	
+	public Conta atualizarConta(String mensagem, Conta conta) throws Exception {
+//		System.out.println("mensagem authrecebida: "+ mensagem);
+		mensagem = cifrador.descriptografar(mensagem);
+//		System.out.println("mensagem descrip: "+ mensagem);
+		if (autentificar(mensagem)) {
+			conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
+			Conta contaAtualizada = bd_contas.atualizarConta(conta.getEmail(), conta);
+			if (contaAtualizada != null) {
+				System.out.println("\t\t\tAutentificação -> Conta atualizada: " + contaAtualizada);
+				contaAtualizada = cifrador.criptografar(cifrador.getChaveAES(), contaAtualizada);
+//				bd_contas.salvarLista();
+//				bd_contas.carregarLista();
+				return contaAtualizada;
+			}
+			
+		}
+		System.out.println("\t\t\tAutentificação -> Falha no cadastro!");
+		return null;
+	}
 
 	public Conta removerConta(String mensagem, Conta conta) throws Exception {
 		conta = fazerLogin(mensagem, conta);
@@ -76,12 +113,17 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 		return null;
 	}
 
-	public BigInteger getChavePubRSA() {
-		return this.chavePubRSA;
-	}
-
-	public BigInteger getChavePrivRSA() {
-		return this.chavePrivRSA;
+	
+	public static void main(String[] args) throws Exception {
+		ImplServidorAutentificacao isa = new ImplServidorAutentificacao();
+		Cifrador cifrador = new Cifrador("chaveAESgateauth");
+		String mensagem = cifrador.criptografar("EstouAutentificado");
+		String email = cifrador.criptografar("brennokm@gmail.com");
+		
+		Conta conta = isa.buscarConta(mensagem, email);
+		System.out.println(conta);
+		conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
+		System.out.println(conta);
 	}
 
 }

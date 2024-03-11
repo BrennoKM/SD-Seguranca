@@ -27,12 +27,16 @@ public class ContaManager implements Serializable{
     	if(contaBusca == null) {
     		mapaContas.put(email, conta);
     		salvarLista();
+    		carregarLista();
+    		contaBusca = buscarConta(email);
     		return conta;
     	}
         return null;
     }
 
     public synchronized Conta buscarConta(String email) throws Exception {
+//    	salvarLista(); // não salvar na busca
+    	carregarLista();
     	if (mapaContas.containsKey(email)) {
 	    	Conta conta = mapaContas.get(email);
 	        return conta;
@@ -44,6 +48,7 @@ public class ContaManager implements Serializable{
     	if (mapaContas.containsKey(email)) {
     		Conta contaRemovida = mapaContas.remove(email);
             salvarLista();
+            carregarLista();
         	return contaRemovida;
         }
 		return null;
@@ -52,27 +57,33 @@ public class ContaManager implements Serializable{
 
     public synchronized Conta atualizarConta(String email, Conta conta) throws Exception {
         if (mapaContas.containsKey(email)) {
-        	Conta contaAtualizada = adicionarConta(email, conta);
+        	removerConta(email);
+        	Conta contaAtualizada = adicionarConta(conta.getEmail(), conta);
         	salvarLista();
+        	carregarLista();
+        	contaAtualizada = buscarConta(email);
         	return contaAtualizada;
         }
 		return null;
     }
     
     @SuppressWarnings("unchecked")
-	public synchronized void carregarLista() throws Exception {
+    public synchronized void carregarLista() throws Exception {
         try (FileInputStream fileIn = new FileInputStream(arquivo);
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
             mapaContas = (HashMap<String, Conta>) in.readObject();
             for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
-        		Conta conta = entry.getValue();
-        		conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
+                String numeroConta = entry.getKey();
+                Conta conta = entry.getValue();
+                Conta contaDescriptografada = cifrador.descriptografar(cifrador.getChaveAES(), conta);
+                mapaContas.put(numeroConta, contaDescriptografada); 
             }
             
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
+
 
     public synchronized void salvarLista() throws Exception {
         try (FileOutputStream fileOut = new FileOutputStream(arquivo);
@@ -88,7 +99,7 @@ public class ContaManager implements Serializable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        descriptografarLista();
+//        descriptografarLista();
     }
     
     public synchronized void criptografarLista() throws Exception {
@@ -126,14 +137,17 @@ public class ContaManager implements Serializable{
 
         // Adicionar ou manipular contas
         manager.adicionarConta("davi@gmail.com", new Conta("Davi", "12345678900", "bem ali do meu lado", "12345", "davi@gmail.com", "qwe1234", "50.0", "usuario"));
-        manager.adicionarConta("brennokm@gmail.com", new Conta("Brenno", "98765432100", "bem ali", "1234", "brennokm@gmail.com", "qwe123", "999", "funcionario"));
+        manager.adicionarConta("brennokm@gmail.com", new Conta("Brenno", "98765432100", "bem ali", "1234", "brennokm@gmail.com", "qwe123", "999999", "funcionario"));
         manager.adicionarConta("icaro@gmail.com", new Conta("Icaro", "98765432109", "bem ali pertinho", "123466", "icaro@gmail.com", "qwe12"));
-        //Conta contaBusca = manager.buscarConta("98765432109");
-        //contaBusca.setSaldo(95);
-        //manager.atualizarConta("98765432109", contaBusca);
+//      manager.removerConta("Sifu");  
+//        Conta contaBusca = manager.buscarConta("sifuss");
+//        contaBusca.setSaldo("95");
+//        contaBusca.setEmail("sifu");
+//        contaBusca.setSenha("sifu");
+//        manager.atualizarConta("sifuss", contaBusca);
         // Salvar lista no arquivo
         manager.salvarLista();
-        manager.carregarLista();
+//        manager.carregarLista();
 
         // Buscar conta pelo CPF
         Conta conta = manager.buscarConta("icaro@gmail.com");

@@ -36,6 +36,17 @@ public class Conta implements Serializable{
 
 	}
 
+	public Conta(Conta conta) {
+		this.nome = conta.getNome();
+	    this.cpf = conta.getCpf();
+	    this.endereco = conta.getEndereco();
+	    this.telefone = conta.getTelefone();
+	    this.email = conta.getEmail();
+	    this.senha = conta.getSenha();
+	    this.saldo = conta.getSaldo();
+	    this.tipoConta = conta.getTipoConta();
+	}
+
 	public String getNome() {
 		return nome;
 	}

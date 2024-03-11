@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.text.Caret;
-
 import Cifra.Cifrador;
 import Modelos.Veiculo;
 import Modelos.Veiculo.Categoria;
@@ -33,16 +31,23 @@ public class VeiculoManager implements Serializable {
 	}
 
 	public synchronized Veiculo adicionarVeiculo(String renavam, Veiculo veiculo) throws Exception {
+		
 		Veiculo veiculoBusca = buscarVeiculoRenavam(renavam);
+//		System.out.println("Veiculo adicionar>posbusca: " + veiculoBusca);
 		if (veiculoBusca == null) {
 			mapaVeiculos.put(renavam, veiculo);
 			salvarLista();
-			return veiculo;
+			carregarLista();
+			veiculoBusca = buscarVeiculoRenavam(renavam);
+//			System.out.println("Veiculo adicionar>posbusca>posbuscaRenavam: " + veiculoBusca);
+			return veiculoBusca;
 		}
 		return null;
 	}
 
 	public synchronized Veiculo buscarVeiculoRenavam(String renavam) throws Exception {
+//		salvarLista(); // não salvar na busca
+		carregarLista();
 		if (mapaVeiculos.containsKey(renavam)) {
 			Veiculo veiculo = mapaVeiculos.get(renavam);
 			return veiculo;
@@ -51,6 +56,8 @@ public class VeiculoManager implements Serializable {
 	}
 
 	public synchronized List<Veiculo> buscarVeiculoModelo(String modelo) throws Exception {
+//		salvarLista(); // não salvar na busca
+		carregarLista();
 		List<Veiculo> veiculos = getVeiculos();
 		for (int i = 0; i < veiculos.size(); i++) {
 			if (!veiculos.get(i).getModelo().equals(modelo)) {
@@ -58,7 +65,7 @@ public class VeiculoManager implements Serializable {
 				i--;
 			}
 		}
-		if(veiculos.size() > 1) {
+		if (veiculos.size() > 1) {
 			return veiculos;
 		}
 		return null;
@@ -68,46 +75,41 @@ public class VeiculoManager implements Serializable {
 		Veiculo veiculo = mapaVeiculos.remove(renavam);
 //		carregarLista();
 		salvarLista();
-//		carregarLista();
+		carregarLista();
 		return veiculo;
 	}
 
 	public synchronized Veiculo atualizarVeiculo(String renavam, Veiculo novoVeiculo) throws Exception {
+//		System.out.println("atualizar: " + novoVeiculo);
 		if (mapaVeiculos.containsKey(renavam)) {
 			removerVeiculo(renavam);
-			Veiculo veiculoAtualizado = adicionarVeiculo(renavam, novoVeiculo);
-//			System.out.println(veiculoAtualizado);
+//			System.out.println("pos remoção: " + novoVeiculo);
+			Veiculo veiculoAtualizado = adicionarVeiculo(novoVeiculo.getRenavam(), novoVeiculo);
+//			System.out.println("veiculo pos adicionar: "+veiculoAtualizado);
 //			carregarLista();
 			salvarLista();
-//			System.out.println(veiculoAtualizado);
-//			carregarLista();
-//			System.out.println(veiculoAtualizado);
+//			System.out.println("veiculo pos salvar: "+veiculoAtualizado);
+			carregarLista();
+//			System.out.println("veiculo pos carregar: "+veiculoAtualizado);
+			veiculoAtualizado = buscarVeiculoRenavam(renavam);
 			return veiculoAtualizado;
 		}
 		return null;
 	}
-	
-	
 
 	@SuppressWarnings("unchecked")
 	public synchronized void carregarLista() throws Exception {
-//		System.out.println("carregandooooooo");
-//		this.mapaVeiculos.clear();
-//		Map<String, Veiculo> mapaVeiculosCarregados = new HashMap<>();
 		try (FileInputStream fileIn = new FileInputStream(arquivo);
 				ObjectInputStream in = new ObjectInputStream(fileIn)) {
 			this.mapaVeiculos = (HashMap<String, Veiculo>) in.readObject();
+			// Descriptografar e atualizar os veículos no mapa
 			for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
-//				String chave = entry.getKey();
-//	            Veiculo veiculo = entry.getValue();
-//	            Veiculo veiculoDescriptografado = cifrador.descriptografar(cifrador.getChaveAES(), veiculo);
-//	            mapaVeiculosCarregados.put(chave, veiculoDescriptografado);
+				String renavam = entry.getKey();
 				Veiculo veiculo = entry.getValue();
-				veiculo = cifrador.descriptografar(cifrador.getChaveAES(), veiculo);
-//				System.out.println("veiculo carregando " + veiculo);
+//	            mapaVeiculos.remove(renavam);
+				Veiculo veiculoDescriptografado = cifrador.descriptografar(cifrador.getChaveAES(), veiculo);
+				mapaVeiculos.put(renavam, veiculoDescriptografado); // Atualizar o veículo no mapa
 			}
-//			System.out.println("novo map: " +mapaVeiculosCarregados);
-//			this.mapaVeiculos = mapaVeiculosCarregados;
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -115,33 +117,26 @@ public class VeiculoManager implements Serializable {
 	}
 
 	public synchronized void salvarLista() throws Exception {
-//		System.out.println("salvandooooooo");
-//		Map<String, Veiculo> veiculosSalvando = new HashMap<>();
 		try (FileOutputStream fileOut = new FileOutputStream(arquivo);
 				ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 			for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
-//				Veiculo veiculo = Veiculo.newVeiculo(entry.getValue());
 				Veiculo veiculo = entry.getValue();
 				veiculo = cifrador.criptografar(cifrador.getChaveAES(), veiculo);
-//				veiculosSalvando.put(entry.getKey(), veiculo);
 			}
 			out.writeObject(mapaVeiculos);
-			// System.out.println("Lista de contas salva em: " + new
-			// File(arquivo).getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		descriptografarLista();
-//		carregarLista();
+//		descriptografarLista();
 	}
-	
+
 	public synchronized void criptografarLista() throws Exception {
 		for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
 			Veiculo veiculo = entry.getValue();
 			veiculo = cifrador.criptografar(cifrador.getChaveAES(), veiculo);
 		}
 	}
-	
+
 	public synchronized void descriptografarLista() throws Exception {
 		for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
 			Veiculo veiculo = entry.getValue();
@@ -168,7 +163,7 @@ public class VeiculoManager implements Serializable {
 		}
 		return veiculos;
 	}
-	
+
 	public synchronized int getQntVeiculos() {
 		return mapaVeiculos.size();
 	}
@@ -204,9 +199,9 @@ public class VeiculoManager implements Serializable {
 		manager.adicionarVeiculo("12345678911", new Executivo("12345678911", "Honda civic", "2024", "120000"));
 		manager.adicionarVeiculo("12345678912", new Executivo("12345678912", "Chevrolet cruze", "2024", "99000"));
 		manager.adicionarVeiculo("12345678913", new Executivo("12345678913", "Audi a3.", "2024", "200000"));
-		
+
 //		 Salvar lista no arquivo
-        manager.salvarLista();
+		manager.salvarLista();
 //        manager.carregarLista();
 
 		// Buscar conta pelo CPF
@@ -235,6 +230,6 @@ public class VeiculoManager implements Serializable {
 		for (Veiculo v : manager.buscarVeiculoModelo("Fiat uno")) {
 			System.out.println(v);
 		}
-		
+
 	}
 }

@@ -6,8 +6,10 @@ import java.rmi.server.UnicastRemoteObject;
 
 import Servidor.ImplServidorAutentificacao;
 import Servidor.ImplServidorGateway;
+import Servidor.ImplServidorLoja;
 import ServidorInterface.ServidorAutentificacao;
 import ServidorInterface.ServidorGateway;
+import ServidorInterface.ServidorLoja;
 
 public class IniciarServidores {
 	private static final int porta = 50005;
@@ -28,7 +30,19 @@ public class IniciarServidores {
 		iniciarServidorGateway();
 	}
 	private static void iniciarServidorLoja() {
-		// TODO Auto-generated method stub
+		int modificadorPorta = 2;
+		try {
+	        // criar objeto servidor
+	        ImplServidorLoja refObjetoRemoto = new ImplServidorLoja();
+	        ServidorLoja skeleton = (ServidorLoja) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
+	        LocateRegistry.createRegistry(porta + modificadorPorta);
+	        Registry registro = LocateRegistry.getRegistry(porta + modificadorPorta);
+	        registro.bind("ServidorLoja", skeleton);
+	        System.out.println("Servidor de veiculos está no ar.");
+	    } catch (Exception e) {
+	        System.err.println("Servidor: " + e.getMessage());
+	        e.printStackTrace();
+	    }
 		
 	}
 	private static void iniciarServidorAutentificacao() {

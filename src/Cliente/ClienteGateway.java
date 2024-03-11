@@ -36,7 +36,7 @@ public class ClienteGateway {
 		int porta = 50005;
 		config();
 //		Scanner entrada = new Scanner(System.in);
-		// System.out.println("Informe o endereço do serviço: ");
+		// System.out.println("Informe o endereço do serviço de gateway: ");
 		// String host = entrada.nextLine();
 		String host = "localhost";
 		boolean conectou = false;
