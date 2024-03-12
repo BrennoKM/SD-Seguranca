@@ -145,6 +145,7 @@ public class VeiculoManager implements Serializable {
 	}
 
 	public synchronized List<Veiculo> getVeiculos() throws Exception {
+		carregarLista();
 		List<Veiculo> veiculos = new ArrayList<>();
 		for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
 			veiculos.add(entry.getValue());

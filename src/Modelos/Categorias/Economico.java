@@ -12,4 +12,9 @@ public class Economico extends Veiculo {
 	public Economico(Veiculo veiculo) {
 		super(veiculo, Categoria.ECONÔMICO);	
 	}
+
+	public Economico(String renavam) {
+		super();
+		this.setRenavam(renavam);
+	}
 }

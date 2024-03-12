@@ -163,7 +163,6 @@ public class ImplServidorGateway implements ServidorGateway {
 			contaLogada = cifrador.descriptografar(chaveAES_GateAuth, contaLogada);
 			contaLogada = cifrador.criptografar(chaveAEScliente, contaLogada);
 			clienteChaveLogados.put(nomeCliente, chaveAEScliente);
-			clienteChave.remove(nomeCliente);
 			return contaLogada;
 		}
 		System.out.println("\t\t-> Falha no login, usuario ou senha incorretos!");
@@ -412,11 +411,11 @@ public class ImplServidorGateway implements ServidorGateway {
 				conta = cifrador.criptografar(chaveAES_GateLoja, conta);
 				veiculo = cifrador.criptografar(chaveAES_GateLoja, veiculo);
 				if (saldo >= preco) {
-					
-					String novoSaldo = Double.toString(saldo-preco);
+
+					String novoSaldo = Double.toString(saldo - preco);
 					novoSaldo = cifrador.criptografar(chaveAES_GateAuth, novoSaldo);
 					contaDescontarSaldo.setSaldo(novoSaldo);
-					
+
 					stubAuth.atualizarConta(msgPrivadaAuth, contaDescontarSaldo);
 					Veiculo veiculoComprado = stubLoja.atribuirDono(msgPrivadaLoja, veiculo, conta.getEmail());
 					if (veiculoComprado != null) {
@@ -428,7 +427,7 @@ public class ImplServidorGateway implements ServidorGateway {
 				} else {
 					System.out.println("\t\t-> Saldo insuficiente!");
 					return null;
-				} 
+				}
 			} else {
 				System.out.println("\t\t-> Veículo já possui dono");
 				return null;
@@ -438,6 +437,9 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
+	// fim loja
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	public static void main(String[] args) throws Exception {
 		String nome = "Adminastror";
 		ServidorGateway stubGateway = null;

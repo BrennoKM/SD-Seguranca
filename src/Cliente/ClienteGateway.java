@@ -62,24 +62,28 @@ public class ClienteGateway {
 				Thread.sleep(4000);
 			}
 		}
-		fazerLogin();
-		if(contaLogada.getTipoConta().equals("usuario")) {
-			usuarioLogado();
+		boolean deslogado = false;
+		while (deslogado == false) {
+			fazerLogin();
+			
+			if (contaLogada.getTipoConta().equals("usuario")) {
+				deslogado = usuarioLogado();
+			}
+			if (contaLogada.getTipoConta().equals("funcionario")) {
+				deslogado = funcionarioLogado();
+			}
 		}
-		if(contaLogada.getTipoConta().equals("funcionario")) {
-			funcionarioLogado();
-		}
-		
+
 	}
 
-	private void usuarioLogado() {
-		new Usuario(nome, stubGateway, cifrador, contaLogada);
-		
+	private boolean usuarioLogado() throws RemoteException, Exception {
+		return new Usuario(nome, stubGateway, cifrador, contaLogada, "Você logou como um usuário comum").iniciar();
+
 	}
-	
-	private void funcionarioLogado() {
-		new Funcionario(nome, stubGateway, cifrador, contaLogada);
-		
+
+	private boolean funcionarioLogado() throws RemoteException, Exception {
+		return new Funcionario(nome, stubGateway, cifrador, contaLogada, "Você logou como funcionário").iniciar();
+
 	}
 
 	public void fazerLogin() throws Exception {
@@ -95,6 +99,9 @@ public class ClienteGateway {
 					try {
 						String opcaoString = in.nextLine();
 						opcaoInt = Integer.valueOf(opcaoString);
+						if(opcaoInt < 1 || opcaoInt > 2){
+							System.err.println("Digite um valor válido");
+						}
 					} catch (NumberFormatException | NoSuchElementException e) {
 						System.err.println("Formato ou valor invalido");
 //						Thread.sleep(2000);
@@ -110,15 +117,15 @@ public class ClienteGateway {
 					contaLogada = stubGateway.fazerCadastro(this.nome, conta);
 					break;
 				}
-				if(contaLogada != null) {
+				if (contaLogada != null) {
 					contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaLogada);
-					System.out.println("Logado com sucesso! "+contaLogada);
+					System.out.println("Logado com sucesso! " + contaLogada);
 					login = true;
 				} else {
 					System.out.println("Falha no login! Usuario ou senha incorretos!");
 				}
 			}
-			Thread.sleep(2000);
+			Thread.sleep(500);
 		}
 	}
 

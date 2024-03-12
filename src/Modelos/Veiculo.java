@@ -39,6 +39,10 @@ public abstract class Veiculo implements Serializable {
 		this.categoria = veiculo.getCategoria();
 	}
 
+	public Veiculo() {
+		
+	}
+
 	public static Veiculo newVeiculo(Veiculo veiculo) {
 		Categoria categoria = veiculo.getCategoria();
 		if (categoria == Categoria.INTERMEDIÁRIO) {
