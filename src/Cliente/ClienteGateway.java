@@ -24,7 +24,7 @@ public class ClienteGateway {
 		abrirServidorGateway();
 	}
 
-	private static void config() {
+	private void config() {
 		System.setProperty("java.security.policy", "java.policy");
 		/*
 		 * if (System.getSecurityManager() == null) { System.setSecurityManager(new

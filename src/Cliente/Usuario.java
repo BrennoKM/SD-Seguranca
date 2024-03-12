@@ -12,11 +12,11 @@ import Modelos.Categorias.Economico;
 import ServidorInterface.ServidorGateway;
 
 public class Usuario {
-	private String nome;
-	private ServidorGateway stubGateway;
-	private Cifrador cifrador;
-	private Conta contaLogada = null;
-	private Scanner in = new Scanner(System.in);
+	protected String nome;
+	protected ServidorGateway stubGateway;
+	protected Cifrador cifrador;
+	protected Conta contaLogada = null;
+	protected Scanner in = new Scanner(System.in);
 
 	public Usuario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem)
 			throws RemoteException, Exception {
@@ -27,7 +27,7 @@ public class Usuario {
 		this.contaLogada = contaLogada;
 	}
 
-	protected int obterOpcao(int i, int j) {
+	protected int obterInt(int i, int j) {
 		int opcaoInt = 0;
 		do {
 			try {
@@ -43,6 +43,24 @@ public class Usuario {
 		} while (opcaoInt < i || opcaoInt > j);
 		return opcaoInt;
 	}
+	
+	protected String obterString(int i, int j) {
+		int opcaoInt = 0;
+		String opcaoString = null;
+		do {
+			try {
+				opcaoString = in.nextLine();
+				opcaoInt = Integer.valueOf(opcaoString);
+				if(opcaoInt < i || opcaoInt > j){
+					System.err.println("Digite um valor válido");
+				}
+			} catch (NumberFormatException | NoSuchElementException e) {
+				System.err.println("Formato ou valor invalido");
+			}
+			
+		} while (opcaoInt < i || opcaoInt > j);
+		return opcaoString;
+	}
 
 	public boolean iniciar() throws RemoteException, Exception {
 		int opcao = 0;
@@ -50,7 +68,7 @@ public class Usuario {
 			System.out.println("Escolha uma opção: \n\t1 - Listar veículos \n\t2 - Listar veículos por categoria"
 					+ "\n\t3 - Pesquisar veículo por renavam \n\t4 - Pesquisar veíuclo por modelo \n\t5 - Exibir quantidade total de veículos"
 					+ "\n\t6 - Comprar veículo \n\t7 - Sair");
-			opcao = obterOpcao(1, 8);
+			opcao = obterInt(1, 8);
 			switch (opcao) {
 			case 1:
 				listarVeiculos();
@@ -139,7 +157,7 @@ public class Usuario {
 
 	protected void listarVeiculosCategoria() throws RemoteException, Exception {
 		System.out.println("Escolha a categoria: \n\t1 - Econômico \n\t2 - Intermediário \n\t3 - Executivo");
-		int categoria = obterOpcao(1, 3);
+		int categoria = obterInt(1, 3);
 		String categoriaString = "ECONÔMICO";
 		if(categoria == 1) {
 			categoriaString = "ECONÔMICO";

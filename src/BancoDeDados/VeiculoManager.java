@@ -72,7 +72,7 @@ public class VeiculoManager implements Serializable {
 	}
 
 	public synchronized Veiculo removerVeiculo(String renavam) throws Exception {
-		Veiculo veiculo = mapaVeiculos.remove(renavam);
+		Veiculo veiculo = Veiculo.newVeiculo(mapaVeiculos.remove(renavam));
 //		carregarLista();
 		salvarLista();
 		carregarLista();
@@ -121,6 +121,7 @@ public class VeiculoManager implements Serializable {
 				ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 			for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
 				Veiculo veiculo = entry.getValue();
+				System.out.println("Salvando: " + veiculo);
 				veiculo = cifrador.criptografar(cifrador.getChaveAES(), veiculo);
 			}
 			out.writeObject(mapaVeiculos);

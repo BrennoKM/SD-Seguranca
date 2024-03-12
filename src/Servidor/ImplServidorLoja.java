@@ -132,6 +132,7 @@ public class ImplServidorLoja implements ServidorLoja {
 	public Veiculo removerVeiculo(String mensagem, Veiculo veiculo) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
 		veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
+		System.out.println("loja remoção descrip: " + veiculo);
 		if (autentificar(mensagem)) {
 			Veiculo veiculoRemovido = bd_veiculos.removerVeiculo(veiculo.getRenavam());
 			if (veiculoRemovido != null) {
