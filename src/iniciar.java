@@ -10,6 +10,6 @@ public class iniciar {
 		
 		
 		// inserir clientes do gateway com nomes diferentes
-		new Cliente("Kevyn");
+		new Cliente("Kevyn", "localhost");
 	}
 }

@@ -19,9 +19,9 @@ public class ClienteGateway {
 	private Conta contaLogada = null;
 	private Scanner in = new Scanner(System.in);
 
-	public ClienteGateway(String nome) throws Exception {
+	public ClienteGateway(String nome, String host) throws Exception {
 		this.nome = nome;
-		abrirServidorGateway();
+		abrirServidorGateway(host);
 	}
 
 	private void config() {
@@ -32,13 +32,13 @@ public class ClienteGateway {
 		 */
 	}
 
-	private void abrirServidorGateway() throws Exception {
+	private void abrirServidorGateway(String host) throws Exception {
 		int porta = 50005;
 		config();
 //		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de gateway: ");
 		// String host = entrada.nextLine();
-		String host = "localhost";
+//		String host = "localhost";
 		boolean conectou = false;
 		while (!conectou) {
 			try {
@@ -159,7 +159,7 @@ public class ClienteGateway {
 	}
 
 	public static void main(String[] args) throws Exception {
-		new ClienteGateway("Kevyn");
+		new ClienteGateway("Kevyn", "localhost");
 	}
 
 }
