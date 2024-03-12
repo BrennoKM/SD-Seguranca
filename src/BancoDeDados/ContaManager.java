@@ -136,15 +136,16 @@ public class ContaManager implements Serializable{
         //manager.carregarLista();
 
         // Adicionar ou manipular contas
-        manager.adicionarConta("davi@gmail.com", new Conta("Davi", "12345678900", "bem ali do meu lado", "12345", "davi@gmail.com", "qwe1234", "50.0", "usuario"));
-        manager.adicionarConta("brennokm@gmail.com", new Conta("Brenno", "98765432100", "bem ali", "1234", "brennokm@gmail.com", "qwe123", "999999", "funcionario"));
-        manager.adicionarConta("icaro@gmail.com", new Conta("Icaro", "98765432109", "bem ali pertinho", "123466", "icaro@gmail.com", "qwe12"));
+//        manager.adicionarConta("davi@gmail.com", new Conta("Davi", "12345678900", "bem ali do meu lado", "12345", "davi@gmail.com", "qwe1234", "50.0", "usuario"));
+//        manager.adicionarConta("brennokm@gmail.com", new Conta("Brenno", "98765432100", "bem ali", "1234", "brennokm@gmail.com", "qwe123", "999999", "funcionario"));
+//        manager.adicionarConta("icaro@gmail.com", new Conta("Icaro", "98765432109", "bem ali pertinho", "123466", "icaro@gmail.com", "qwe12"));
 //      manager.removerConta("Sifu");  
-//        Conta contaBusca = manager.buscarConta("sifuss");
-//        contaBusca.setSaldo("95");
+//        Conta contaBusca = manager.buscarConta("icaro@gmail.com");
+//        contaBusca.setSaldo("9599999");
 //        contaBusca.setEmail("sifu");
 //        contaBusca.setSenha("sifu");
-//        manager.atualizarConta("sifuss", contaBusca);
+//        contaBusca.setTipoConta("funcionario");
+//        manager.atualizarConta("icaro@gmail.com", contaBusca);
         // Salvar lista no arquivo
         manager.salvarLista();
 //        manager.carregarLista();

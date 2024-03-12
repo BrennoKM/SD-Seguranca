@@ -121,7 +121,7 @@ public class VeiculoManager implements Serializable {
 				ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 			for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
 				Veiculo veiculo = entry.getValue();
-				System.out.println("Salvando: " + veiculo);
+//				System.out.println("Salvando: " + veiculo);
 				veiculo = cifrador.criptografar(cifrador.getChaveAES(), veiculo);
 			}
 			out.writeObject(mapaVeiculos);

@@ -28,11 +28,11 @@ public class ImplServidorGateway implements ServidorGateway {
 	private Map<String, String> clienteChave = new HashMap<>();;
 	private Map<String, String> clienteChaveLogados = new HashMap<>();;
 
-	public ImplServidorGateway() throws Exception {
+	public ImplServidorGateway(String hostAuth, String hostLoja) throws Exception {
 		this.clienteChave = new HashMap<>();
 		cifrador = new Cifrador();
-		abrirServidorAutentificacao();
-		abrirServidorLoja();
+		abrirServidorAutentificacao(hostAuth);
+		abrirServidorLoja(hostLoja);
 		// fazerLogin("brennokm@gmail.com", "qwe123");
 	}
 
@@ -44,13 +44,13 @@ public class ImplServidorGateway implements ServidorGateway {
 		 */
 	}
 
-	private void abrirServidorLoja() throws Exception {
+	private void abrirServidorLoja(String host) throws Exception {
 		int porta = 50007;
 		config();
 		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de autentificação: ");
 		// String host = entrada.nextLine();
-		String host = "localhost";
+//		String host = "localhost";
 		boolean conectou = false;
 		while (!conectou) {
 			try {
@@ -66,13 +66,13 @@ public class ImplServidorGateway implements ServidorGateway {
 		}
 	}
 
-	private void abrirServidorAutentificacao() throws Exception {
+	private void abrirServidorAutentificacao(String host) throws Exception {
 		int porta = 50006;
 		config();
 		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de loja: ");
 		// String host = entrada.nextLine();
-		String host = "localhost";
+//		String host = "localhost";
 		boolean conectou = false;
 		while (!conectou) {
 			try {
@@ -439,7 +439,55 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	// fim loja
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	// banco
+
+	public Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque) throws RemoteException, Exception {
+		if (autentificarLogin(nomeCliente)) {
+			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
+
+			valorSaque = cifrador.descriptografar(chaveAEScliente, valorSaque);
+			conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "saque de " + valorSaque);
+			conta = stubAuth.buscarConta(msgPrivadaAuth, conta.getEmail());
+			if (conta == null) {
+				System.out.println("\t\t-> Conta não encontrada!");
+				return null;
+			}
+			conta = cifrador.descriptografar(chaveAES_GateAuth, conta);
+
+			double saldo = Double.parseDouble(conta.getSaldo());
+			double saque = Double.parseDouble(valorSaque);
+
+			Conta contaDescontarSaque = cifrador.criptografar(chaveAES_GateAuth, new Conta(conta));
+			if (saldo >= saque) {
+
+				String novoSaldo = Double.toString(saldo - saque);
+				novoSaldo = cifrador.criptografar(chaveAES_GateAuth, novoSaldo);
+				contaDescontarSaque.setSaldo(novoSaldo);
+
+				contaDescontarSaque = stubAuth.atualizarConta(msgPrivadaAuth, contaDescontarSaque);
+
+				if (contaDescontarSaque != null) {
+					System.out.println("\t\t-> Saque realizado com sucesso!");
+					contaDescontarSaque = cifrador.descriptografar(chaveAES_GateAuth, contaDescontarSaque);
+					contaDescontarSaque = cifrador.criptografar(chaveAEScliente, contaDescontarSaque);
+					return contaDescontarSaque;
+				}
+			} else {
+				System.out.println("\t\t-> Saldo insuficiente!");
+				return null;
+			}
+
+		}
+		System.out.println("\t\t-> Falha no saque");
+		return null;
+	}
+
+	// fim banco
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public static void main(String[] args) throws Exception {
 		String nome = "Adminastror";
 		ServidorGateway stubGateway = null;

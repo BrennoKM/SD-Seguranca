@@ -65,11 +65,13 @@ public class Usuario {
 	public boolean iniciar() throws RemoteException, Exception {
 		int opcao = 0;
 		while (opcao != 8) {
-			System.out.println("Escolha uma opção: \n\t1 - Listar veículos \n\t2 - Listar veículos por categoria"
+			System.out.println("Escolha uma opção: \n\t0 - Acessar conta bancária \n\t1 - Listar veículos \n\t2 - Listar veículos por categoria"
 					+ "\n\t3 - Pesquisar veículo por renavam \n\t4 - Pesquisar veíuclo por modelo \n\t5 - Exibir quantidade total de veículos"
-					+ "\n\t6 - Comprar veículo \n\t7 - Sair");
-			opcao = obterInt(1, 8);
+					+ "\n\t6 - Comprar veículo \n\t7 - Ver dados da minha conta \n\t8 - Sair");
+			opcao = obterInt(0, 8);
 			switch (opcao) {
+			case 0:
+				acessarBanco();
 			case 1:
 				listarVeiculos();
 				break;
@@ -99,6 +101,11 @@ public class Usuario {
 			}
 		}
 		return false;
+	}
+
+	protected void acessarBanco() {
+		
+		
 	}
 
 	protected void verMinhaconta() {

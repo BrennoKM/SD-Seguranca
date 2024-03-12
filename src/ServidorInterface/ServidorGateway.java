@@ -26,4 +26,7 @@ public interface ServidorGateway extends Remote{
 	List<Veiculo> listarVeiculos(String nomeCliente, String categoria) throws RemoteException, Exception;
 	String getQntVeiculo(String nomeCliente) throws RemoteException, Exception;
 	Veiculo comprarVeiculo(String nomeCliente, Conta conta, Veiculo veiculo) throws RemoteException, Exception;
+	
+	//banco
+	Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque) throws RemoteException, Exception;
 }
