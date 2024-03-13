@@ -67,6 +67,7 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 //		System.out.println("mensagem descrip: "+ mensagem);
 		if (autentificar(mensagem)) {
 			email = cifrador.descriptografar(cifrador.getChaveAES(), email);
+//			System.out.println("email descrip busca conta implauth: "+ email);
 			Conta contaBusca = bd_contas.buscarConta(email);
 			if (contaBusca != null) {
 				System.out.println("\t\t\tAutentificação -> Conta encontrada: " + contaBusca);
@@ -77,7 +78,7 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 			}
 			
 		}
-		System.out.println("\t\t\tAutentificação -> Falha no cadastro!");
+		System.out.println("\t\t\tAutentificação -> Falha na busca!");
 		return null;
 	}
 	

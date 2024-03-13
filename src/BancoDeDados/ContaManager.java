@@ -45,6 +45,7 @@ public class ContaManager implements Serializable{
     }
 
     public synchronized Conta removerConta(String email) throws Exception {
+    	carregarLista();
     	if (mapaContas.containsKey(email)) {
     		Conta contaRemovida = mapaContas.remove(email);
             salvarLista();

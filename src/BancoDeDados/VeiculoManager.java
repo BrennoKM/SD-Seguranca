@@ -31,7 +31,7 @@ public class VeiculoManager implements Serializable {
 	}
 
 	public synchronized Veiculo adicionarVeiculo(String renavam, Veiculo veiculo) throws Exception {
-		
+
 		Veiculo veiculoBusca = buscarVeiculoRenavam(renavam);
 //		System.out.println("Veiculo adicionar>posbusca: " + veiculoBusca);
 		if (veiculoBusca == null) {
@@ -72,11 +72,21 @@ public class VeiculoManager implements Serializable {
 	}
 
 	public synchronized Veiculo removerVeiculo(String renavam) throws Exception {
-		Veiculo veiculo = Veiculo.newVeiculo(mapaVeiculos.remove(renavam));
-//		carregarLista();
-		salvarLista();
 		carregarLista();
-		return veiculo;
+		if (mapaVeiculos.containsKey(renavam)) {
+//			System.out.println("Print veiculos na pré remoção");
+//			for (Veiculo v : getVeiculos()) {
+//				System.out.println(v);
+//			}
+			Veiculo veiculo = mapaVeiculos.remove(renavam);
+//			System.out.println("Removendo: " + veiculo);
+//			veiculo = cifrador.descriptografar(cifrador.getChaveAES(), veiculo);
+//		carregarLista();
+			salvarLista();
+			carregarLista();
+			return veiculo;
+		}
+		return null;
 	}
 
 	public synchronized Veiculo atualizarVeiculo(String renavam, Veiculo novoVeiculo) throws Exception {

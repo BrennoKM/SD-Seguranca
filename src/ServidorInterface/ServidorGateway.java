@@ -29,4 +29,7 @@ public interface ServidorGateway extends Remote{
 	
 	//banco
 	Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque) throws RemoteException, Exception;
+	Conta fazerDeposito(String nomeCliente, Conta conta, String valorDepositp) throws RemoteException, Exception;
+	Conta fazerTransferencia(String nomeCliente, Conta contaBeneficente, String valorTransferencia, String emailFavorecido) throws RemoteException, Exception;
+	Conta buscarConta(String nomeCliente, String emailConta) throws RemoteException, Exception;
 }

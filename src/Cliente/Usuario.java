@@ -33,17 +33,17 @@ public class Usuario {
 			try {
 				String opcaoString = in.nextLine();
 				opcaoInt = Integer.valueOf(opcaoString);
-				if(opcaoInt < i || opcaoInt > j){
+				if (opcaoInt < i || opcaoInt > j) {
 					System.err.println("Digite um valor válido");
 				}
 			} catch (NumberFormatException | NoSuchElementException e) {
 				System.err.println("Formato ou valor invalido");
 			}
-			
+
 		} while (opcaoInt < i || opcaoInt > j);
 		return opcaoInt;
 	}
-	
+
 	protected String obterString(int i, int j) {
 		int opcaoInt = 0;
 		String opcaoString = null;
@@ -51,13 +51,13 @@ public class Usuario {
 			try {
 				opcaoString = in.nextLine();
 				opcaoInt = Integer.valueOf(opcaoString);
-				if(opcaoInt < i || opcaoInt > j){
+				if (opcaoInt < i || opcaoInt > j) {
 					System.err.println("Digite um valor válido");
 				}
 			} catch (NumberFormatException | NoSuchElementException e) {
 				System.err.println("Formato ou valor invalido");
 			}
-			
+
 		} while (opcaoInt < i || opcaoInt > j);
 		return opcaoString;
 	}
@@ -65,9 +65,9 @@ public class Usuario {
 	public boolean iniciar() throws RemoteException, Exception {
 		int opcao = 0;
 		while (opcao != 8) {
-			System.out.println("Escolha uma opção: \n\t0 - Acessar conta bancária \n\t1 - Listar veículos \n\t2 - Listar veículos por categoria"
+			System.out.println("Escolha uma opção: \n\t1 - Listar veículos \n\t2 - Listar veículos por categoria"
 					+ "\n\t3 - Pesquisar veículo por renavam \n\t4 - Pesquisar veíuclo por modelo \n\t5 - Exibir quantidade total de veículos"
-					+ "\n\t6 - Comprar veículo \n\t7 - Ver dados da minha conta \n\t8 - Sair");
+					+ "\n\t6 - Comprar veículo \n\t7 - Ver dados da minha conta \n\t8 - Sair \n\t0 - Acessar conta bancária");
 			opcao = obterInt(0, 8);
 			switch (opcao) {
 			case 0:
@@ -86,7 +86,6 @@ public class Usuario {
 				break;
 			case 5:
 				getQntVeiculos();
-				
 				break;
 			case 6:
 				comprarVeiculo();
@@ -103,28 +102,139 @@ public class Usuario {
 		return false;
 	}
 
-	protected void acessarBanco() {
-		
-		
+	protected void acessarBanco() throws Exception {
+		boolean usandoBanco = true;
+		while (usandoBanco) {
+			System.out.println(
+					"Opções do banco: \n\t1 - Fazer saque \n\t2 - Fazer depósito \n\t3 - Fazer uma transferência "
+							+ "\n\t4 - Visualizar minha conta \n\t5 - Simular investimentos \n\t6 - Sair do banco");
+			int opcaoBanco = obterInt(1, 6);
+			switch (opcaoBanco) {
+			case 1:
+				fazerSaque();
+				break;
+			case 2:
+				fazerDeposito();
+				break;
+			case 3:
+				fazerTransferencia();
+				break;
+			case 4:
+				verMinhaconta();
+				break;
+			case 5:
+				simularInvestimentos();
+				break;
+			case 6:
+				usandoBanco = false;
+				break;
+			}
+		}
+
 	}
 
-	protected void verMinhaconta() {
-		System.out.println("Meus dados: " + contaLogada);
-		
+	protected void fazerSaque() throws Exception {
+		System.out.println("Digite o valor do seu saque: ");
+		String valorSaque = obterString(1, Integer.MAX_VALUE);
+
+		valorSaque = cifrador.criptografar(valorSaque);
+		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
+
+		conta = stubGateway.fazerSaque(nome, conta, valorSaque);
+		if (conta != null) {
+			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), conta);
+			System.out.println("Saque feito, novo saldo é: " + contaLogada.getSaldo());
+		} else {
+			System.out.println("Falha no saque");
+		}
+	}
+
+	protected void fazerDeposito() throws Exception {
+		System.out.println("Digite o valor do seu saque: ");
+		String valorDeposito = obterString(1, Integer.MAX_VALUE);
+
+		valorDeposito = cifrador.criptografar(valorDeposito);
+		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
+
+		conta = stubGateway.fazerDeposito(nome, conta, valorDeposito);
+		if (conta != null) {
+			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), conta);
+			System.out.println("Deposito feito, novo saldo é: " + contaLogada.getSaldo());
+		} else {
+			System.out.println("Falha no deposito");
+		}
+	}
+
+	protected void fazerTransferencia() throws Exception {
+		System.out.println("Digite o valor da sua transferência: ");
+		String valorTransferencia = obterString(1, Integer.MAX_VALUE);
+
+		System.out.println("Digite o email do favorecido: ");
+		String emailFavorecido = in.nextLine();
+
+		valorTransferencia = cifrador.criptografar(valorTransferencia);
+		emailFavorecido = cifrador.criptografar(emailFavorecido);
+		Conta contaBeneficente = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
+
+		contaBeneficente = stubGateway.fazerTransferencia(nome, contaBeneficente, valorTransferencia, emailFavorecido);
+		if (contaBeneficente != null) {
+			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaBeneficente);
+			System.out.println("Transferência feita, novo saldo é: " + contaLogada.getSaldo());
+		} else {
+			System.out.println("Falha na transferência");
+		}
+	}
+
+	protected void verMinhaconta() throws RemoteException, Exception {
+		String email = contaLogada.getEmail();
+		email = cifrador.criptografar(email);
+		Conta contaBusca = stubGateway.buscarConta(nome, email);
+		if (contaBusca != null) {
+			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaBusca);
+			System.out.println("Meus dados: " + contaLogada);
+		}
+
+	}
+
+	protected double calcularRendimento(double dinheiro, double taxa, int meses) {
+		if (meses == 0) {
+			return dinheiro;
+		}
+		return calcularRendimento(dinheiro * taxa, taxa, --meses);
+	}
+
+	protected void simularInvestimentos() {
+		double saldoOriginal = Double.valueOf(contaLogada.getSaldo());
+		double poupanca3 = calcularRendimento(saldoOriginal, 1.005, 3);
+		double poupanca6 = calcularRendimento(poupanca3, 1.005, 3);
+		double poupanca12 = calcularRendimento(poupanca6, 1.005, 3);
+
+		double rendaFixa3 = calcularRendimento(saldoOriginal, 1.015, 3);
+		double rendaFixa6 = calcularRendimento(rendaFixa3, 1.015, 3);
+		double rendaFixa12 = calcularRendimento(rendaFixa6, 1.015, 3);
+
+		String simulacao = String.format(
+				"\n\tSaldo original: %.2f\n" + "\tPoupança após 3 meses: %.2f\n" + "\tPoupança após 6 meses: %.2f\n"
+						+ "\tPoupança após 12 meses: %.2f\n\n" + "\tRenda fixa após 3 meses: %.2f\n"
+						+ "\tRenda fixa após 6 meses: %.2f\n" + "\tRenda fixa após 12 meses: %.2f",
+				saldoOriginal, poupanca3, poupanca6, poupanca12, rendaFixa3, rendaFixa6, rendaFixa12);
+
+		System.out.println("Simulação de investimento: " + simulacao);
 	}
 
 	protected void getQntVeiculos() throws RemoteException, Exception {
-		System.out.println(cifrador.descriptografar(stubGateway.getQntVeiculo(this.nome)));
+		System.out.println(
+				"Quantidade total de veículos: " + cifrador.descriptografar(stubGateway.getQntVeiculo(this.nome)));
 	}
 
 	protected void comprarVeiculo() throws RemoteException, Exception {
 		System.out.println("Digite o renavam do veículo a ser comprado: ");
 		String renavamCompra = in.nextLine();
 		Veiculo veiculoCompra = new Economico(renavamCompra);
-		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), contaLogada);
+		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
 		veiculoCompra = cifrador.criptografar(cifrador.getChaveAES(), veiculoCompra);
 		veiculoCompra = stubGateway.comprarVeiculo(this.nome, conta, veiculoCompra);
-		if(veiculoCompra != null) {
+		if (veiculoCompra != null) {
 			veiculoCompra = cifrador.descriptografar(cifrador.getChaveAES(), veiculoCompra);
 			System.out.println("Veículo comprado com sucesso: " + veiculoCompra);
 		} else {
@@ -149,7 +259,7 @@ public class Usuario {
 		}
 	}
 
-	protected void buscarVeiculoRenavam() throws RemoteException, Exception {
+	protected Veiculo buscarVeiculoRenavam() throws RemoteException, Exception {
 		System.out.println("Digite o renavam: ");
 		String renavam = in.nextLine();
 		renavam = cifrador.criptografar(renavam);
@@ -157,16 +267,18 @@ public class Usuario {
 		if (veiculo != null) {
 			veiculo = cifrador.descriptografar(cifrador.getChaveAES(), veiculo);
 			System.out.println("Veículos encontrado: " + veiculo);
+			return veiculo;
 		} else {
 			System.out.println("Falha na busca");
 		}
+		return null;
 	}
 
 	protected void listarVeiculosCategoria() throws RemoteException, Exception {
 		System.out.println("Escolha a categoria: \n\t1 - Econômico \n\t2 - Intermediário \n\t3 - Executivo");
 		int categoria = obterInt(1, 3);
 		String categoriaString = "ECONÔMICO";
-		if(categoria == 1) {
+		if (categoria == 1) {
 			categoriaString = "ECONÔMICO";
 		} else if (categoria == 2) {
 			categoriaString = "INTERMEDIÁRIO";

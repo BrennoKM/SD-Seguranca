@@ -101,8 +101,8 @@ public class ImplServidorLoja implements ServidorLoja {
 
 	public Veiculo adicionarVeiculo(String mensagem, Veiculo veiculo) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
-		veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
 		if (autentificar(mensagem)) {
+			veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
 			Veiculo veiculoAdicionado = bd_veiculos.adicionarVeiculo(veiculo.getRenavam(), veiculo);
 			if (veiculoAdicionado != null) {
 				System.out.println("\t\t\tLoja -> Veiculo adicionado: " + veiculoAdicionado);
@@ -116,8 +116,8 @@ public class ImplServidorLoja implements ServidorLoja {
 
 	public Veiculo atualizarVeiculo(String mensagem, Veiculo veiculo) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
-		veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
 		if (autentificar(mensagem)) {
+			veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
 			Veiculo veiculoAtualizado = bd_veiculos.atualizarVeiculo(veiculo.getRenavam(), veiculo);
 			if (veiculoAtualizado != null) {
 				System.out.println("\t\t\tLoja -> Veiculo atualizado: " + veiculoAtualizado);
@@ -131,9 +131,12 @@ public class ImplServidorLoja implements ServidorLoja {
 
 	public Veiculo removerVeiculo(String mensagem, Veiculo veiculo) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
-		veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
-		System.out.println("loja remoção descrip: " + veiculo);
+		
+//		System.out.println("loja remoção crip: " + veiculo);
 		if (autentificar(mensagem)) {
+			veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
+//			System.out.println("loja remoção descrip: " + veiculo);
+//			System.out.println("renavam: " + veiculo.getRenavam());
 			Veiculo veiculoRemovido = bd_veiculos.removerVeiculo(veiculo.getRenavam());
 			if (veiculoRemovido != null) {
 				System.out.println("\t\t\tLoja -> Veiculo removido: " + veiculoRemovido);

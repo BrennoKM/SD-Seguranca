@@ -138,13 +138,13 @@ public class ImplServidorGateway implements ServidorGateway {
 		return veiculo;
 	}
 
-	private String requisicaoGateway(String nomeCliente, String chaveAEScliente, String mensagem, String tipo)
-			throws RemoteException, Exception {
+	private String requisicaoGateway(String nomeCliente, String chaveAEScliente, String mensagem, String tipo,
+			String chaveAESsaida) throws RemoteException, Exception {
 		System.out.println("\n\tGateway -> Requisição de " + tipo + " do cliente " + nomeCliente);
 		System.out.println("\t\t-> Mensagem recebida de " + nomeCliente + ": " + mensagem);
 		mensagem = cifrador.descriptografar(chaveAEScliente, mensagem);
 		System.out.println("\t\t-> Mensagem descriptografada de " + nomeCliente + ": " + mensagem);
-		mensagem = cifrador.criptografar(this.chaveAES_GateLoja, mensagem);
+		mensagem = cifrador.criptografar(chaveAESsaida, mensagem);
 		return mensagem;
 	}
 
@@ -272,7 +272,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	public Veiculo buscarVeiculoRenavam(String nomeCliente, String renavam) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
-			renavam = requisicaoGateway(nomeCliente, chaveAEScliente, renavam, "busca Renavam");
+			renavam = requisicaoGateway(nomeCliente, chaveAEScliente, renavam, "busca Renavam", chaveAES_GateLoja);
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			Veiculo veiculoBusca = stubLoja.buscarVeiculoPorRenavam(msgPrivada, renavam);
 			if (veiculoBusca != null) {
@@ -289,7 +289,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	public List<Veiculo> buscarVeiculoModelo(String nomeCliente, String modelo) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
-			modelo = requisicaoGateway(nomeCliente, chaveAEScliente, modelo, "busca modelo");
+			modelo = requisicaoGateway(nomeCliente, chaveAEScliente, modelo, "busca modelo", chaveAES_GateLoja);
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			List<Veiculo> veiculoBusca = stubLoja.buscarVeiculoPorModelo(msgPrivada, modelo);
 			if (veiculoBusca != null) {
@@ -482,6 +482,121 @@ public class ImplServidorGateway implements ServidorGateway {
 
 		}
 		System.out.println("\t\t-> Falha no saque");
+		return null;
+	}
+
+	public Conta fazerDeposito(String nomeCliente, Conta conta, String valorDeposito)
+			throws RemoteException, Exception {
+		if (autentificarLogin(nomeCliente)) {
+			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
+
+			valorDeposito = cifrador.descriptografar(chaveAEScliente, valorDeposito);
+			conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "deposito de " + valorDeposito);
+			conta = stubAuth.buscarConta(msgPrivadaAuth, conta.getEmail());
+			if (conta == null) {
+				System.out.println("\t\t-> Conta não encontrada!");
+				return null;
+			}
+			conta = cifrador.descriptografar(chaveAES_GateAuth, conta);
+
+			double saldo = Double.parseDouble(conta.getSaldo());
+			double deposito = Double.parseDouble(valorDeposito);
+
+			Conta contaInserirDeposito = cifrador.criptografar(chaveAES_GateAuth, new Conta(conta));
+
+			String novoSaldo = Double.toString(saldo + deposito);
+			novoSaldo = cifrador.criptografar(chaveAES_GateAuth, novoSaldo);
+			contaInserirDeposito.setSaldo(novoSaldo);
+
+			contaInserirDeposito = stubAuth.atualizarConta(msgPrivadaAuth, contaInserirDeposito);
+
+			if (contaInserirDeposito != null) {
+				System.out.println("\t\t-> Depósito realizado com sucesso!");
+				contaInserirDeposito = cifrador.descriptografar(chaveAES_GateAuth, contaInserirDeposito);
+				contaInserirDeposito = cifrador.criptografar(chaveAEScliente, contaInserirDeposito);
+				return contaInserirDeposito;
+			}
+
+		}
+		System.out.println("\t\t-> Falha no depósito");
+		return null;
+	}
+
+	public Conta fazerTransferencia(String nomeCliente, Conta contaBeneficente, String valorTransferencia,
+			String emailFavorecido) throws RemoteException, Exception {
+		if (autentificarLogin(nomeCliente)) {
+			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
+
+			Conta contaFavorecido = buscarConta(nomeCliente, emailFavorecido);
+			if (contaFavorecido == null) {
+				System.out.println("\t\t-> Conta favorecido não encontrada");
+				return null;
+			}
+			contaFavorecido = cifrador.descriptografar(chaveAEScliente, contaFavorecido);
+
+			String emailBeneficente = contaBeneficente.getEmail();
+			contaBeneficente = buscarConta(nomeCliente, emailBeneficente);
+			if (contaBeneficente == null) {
+				System.out.println("\t\t-> Conta beneficente não encontrada");
+				return null;
+			}
+			contaBeneficente = cifrador.descriptografar(chaveAEScliente, contaBeneficente);
+			valorTransferencia = cifrador.descriptografar(chaveAEScliente, valorTransferencia);
+
+			double saldoBeneficente = Double.parseDouble(contaBeneficente.getSaldo());
+			double transferencia = Double.parseDouble(valorTransferencia);
+			double saldoFavorecido = Double.parseDouble(contaFavorecido.getSaldo());
+
+			if (saldoBeneficente < transferencia) {
+				System.out.println("\t\t-> Beneficente não possui saldo suficiente para realizar a transferência");
+				return null;
+			}
+
+			double novoSaldoBeneficente = saldoBeneficente - transferencia;
+			double novoSaldoFavorecido = saldoFavorecido + transferencia;
+
+			contaBeneficente.setSaldo(Double.toString(novoSaldoBeneficente));
+			contaFavorecido.setSaldo(Double.toString(novoSaldoFavorecido));
+
+			Conta contaDescontarTransferencia = cifrador.criptografar(chaveAES_GateAuth, new Conta(contaBeneficente));
+			Conta contaSomarTransferencia = cifrador.criptografar(chaveAES_GateAuth, new Conta(contaFavorecido));
+
+			contaDescontarTransferencia = stubAuth.atualizarConta(msgPrivadaAuth, contaDescontarTransferencia);
+			contaSomarTransferencia = stubAuth.atualizarConta(msgPrivadaAuth, contaSomarTransferencia);
+
+			if (contaSomarTransferencia != null) {
+				System.out.println("\t\t-> Favorecido recebeu a transferência!");
+			}
+			if (contaDescontarTransferencia != null) {
+				System.out.println("\t\t-> Beneficente fez a transferência!");
+				contaDescontarTransferencia = cifrador.descriptografar(chaveAES_GateAuth, contaDescontarTransferencia);
+				contaDescontarTransferencia = cifrador.criptografar(chaveAEScliente, contaDescontarTransferencia);
+				return contaDescontarTransferencia;
+			}
+		}
+		System.out.println("\t\t-> Falha na transferência");
+		return null;
+	}
+
+	public Conta buscarConta(String nomeCliente, String emailConta) throws RemoteException, Exception {
+		if (autentificarLogin(nomeCliente)) {
+			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
+
+			emailConta = requisicaoGateway(nomeCliente, chaveAEScliente, emailConta, "buscar conta", chaveAES_GateAuth);
+			Conta conta = stubAuth.buscarConta(msgPrivadaAuth, emailConta);
+			if (conta != null) {
+				conta = cifrador.descriptografar(chaveAES_GateAuth, conta);
+				System.out.println("\t\t-> Conta encontrada!");
+				conta = cifrador.criptografar(chaveAEScliente, conta);
+				return conta;
+			} else {
+				System.out.println("\t\t-> Conta não encontrada");
+				return null;
+			}
+		}
 		return null;
 	}
 
