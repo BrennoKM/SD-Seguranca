@@ -2,6 +2,7 @@ package BancoDeDados;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,7 @@ public class VeiculoManager implements Serializable {
 			}
 		}
 		if (veiculos.size() > 1) {
+			veiculos.sort(Comparator.comparing(Veiculo::getModelo));
 			return veiculos;
 		}
 		return null;
@@ -161,6 +163,7 @@ public class VeiculoManager implements Serializable {
 		for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
 			veiculos.add(entry.getValue());
 		}
+		veiculos.sort(Comparator.comparing(Veiculo::getModelo));
 		return veiculos;
 	}
 
@@ -173,6 +176,7 @@ public class VeiculoManager implements Serializable {
 				i--;
 			}
 		}
+		veiculos.sort(Comparator.comparing(Veiculo::getModelo));
 		return veiculos;
 	}
 

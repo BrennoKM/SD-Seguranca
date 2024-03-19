@@ -443,7 +443,7 @@ public class ImplServidorGateway implements ServidorGateway {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	// banco
 
-	public Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque) throws RemoteException, Exception {
+	public synchronized Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
 			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
@@ -485,7 +485,7 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public Conta fazerDeposito(String nomeCliente, Conta conta, String valorDeposito)
+	public synchronized Conta fazerDeposito(String nomeCliente, Conta conta, String valorDeposito)
 			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
@@ -510,7 +510,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			contaInserirDeposito.setSaldo(novoSaldo);
 
 			contaInserirDeposito = stubAuth.atualizarConta(msgPrivadaAuth, contaInserirDeposito);
-
+//			Thread.sleep(10000);
 			if (contaInserirDeposito != null) {
 				System.out.println("\t\t-> Depósito realizado com sucesso!");
 				contaInserirDeposito = cifrador.descriptografar(chaveAES_GateAuth, contaInserirDeposito);
@@ -523,7 +523,7 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public Conta fazerTransferencia(String nomeCliente, Conta contaBeneficente, String valorTransferencia,
+	public synchronized Conta fazerTransferencia(String nomeCliente, Conta contaBeneficente, String valorTransferencia,
 			String emailFavorecido) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);

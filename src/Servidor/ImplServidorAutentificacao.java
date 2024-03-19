@@ -27,13 +27,13 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 
 	public Conta fazerLogin(String mensagem, Conta conta) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
-		conta = cifrador.descriptografar(chaveAES_GateAuth, conta);
 		if (autentificar(mensagem)) {
+			conta = cifrador.descriptografar(chaveAES_GateAuth, conta);
 			String email = conta.getEmail();
 			String senha = conta.getSenha();
 			Conta contaBusca = bd_contas.buscarConta(email);
 			if (contaBusca != null && contaBusca.getSenha().equals(senha)) {
-				System.out.println("			Autentificação -> Logado com sucesso! " + contaBusca);
+				System.out.println("\t\t\tAutentificação -> Logado com sucesso! " + contaBusca);
 				contaBusca = cifrador.criptografar(cifrador.getChaveAES(), contaBusca);
 				return contaBusca;
 			}
@@ -45,12 +45,14 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 
 	public Conta fazerCadastro(String mensagem, Conta conta) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
+//		System.out.println("Conta recebida cad: " + conta);
 		if (autentificar(mensagem)) {
-			conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
+			conta = cifrador.descriptografar(chaveAES_GateAuth, conta);
+//			System.out.println("Conta recebida cad descri: " + conta);
 			Conta contaCadastrada = bd_contas.adicionarConta(conta.getEmail(), conta);
 			if (contaCadastrada != null) {
 				System.out.println("\t\t\tAutentificação -> Cadastrado com sucesso! " + contaCadastrada);
-				contaCadastrada = cifrador.criptografar(cifrador.getChaveAES(), contaCadastrada);
+				contaCadastrada = cifrador.criptografar(chaveAES_GateAuth, contaCadastrada);
 //				bd_contas.salvarLista();
 //				bd_contas.carregarLista();
 				return contaCadastrada;

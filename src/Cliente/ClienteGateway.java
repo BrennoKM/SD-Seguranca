@@ -122,7 +122,7 @@ public class ClienteGateway {
 					System.out.println("Logado com sucesso! " + contaLogada);
 					login = true;
 				} else {
-					System.out.println("Falha no login! Usuario ou senha incorretos!");
+					System.out.println("Falha no login/cadastro!!");
 				}
 			}
 			Thread.sleep(500);

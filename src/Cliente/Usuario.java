@@ -150,7 +150,7 @@ public class Usuario {
 	}
 
 	protected void fazerDeposito() throws Exception {
-		System.out.println("Digite o valor do seu saque: ");
+		System.out.println("Digite o valor do seu deposito: ");
 		String valorDeposito = obterString(1, Integer.MAX_VALUE);
 
 		valorDeposito = cifrador.criptografar(valorDeposito);

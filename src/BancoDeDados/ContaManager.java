@@ -29,7 +29,7 @@ public class ContaManager implements Serializable{
     		salvarLista();
     		carregarLista();
     		contaBusca = buscarConta(email);
-    		return conta;
+    		return contaBusca;
     	}
         return null;
     }
