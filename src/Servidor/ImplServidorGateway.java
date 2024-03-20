@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import Cifra.ChavePubModulo;
+import Cifra.ChavesModulo;
 import Cifra.Cifrador;
 import Modelos.Conta;
+import Modelos.TokenInfo;
 import Modelos.Veiculo;
 import Modelos.Categorias.Intermediario;
 import Modelos.Veiculo.Categoria;
@@ -25,11 +26,11 @@ public class ImplServidorGateway implements ServidorGateway {
 	private Cifrador cifrador;
 	private ServidorAutentificacao stubAuth;
 	private ServidorLoja stubLoja;
-	private Map<String, String> clienteChave = new HashMap<>();;
-	private Map<String, String> clienteChaveLogados = new HashMap<>();;
+	private Map<String, TokenInfo> tokenClientes = new HashMap<>();
+	private Map<String, TokenInfo> tokenClientesLogados = new HashMap<>();
 
 	public ImplServidorGateway(String hostAuth, String hostLoja) throws Exception {
-		this.clienteChave = new HashMap<>();
+		this.tokenClientes = new HashMap<>();
 		cifrador = new Cifrador();
 		abrirServidorAutentificacao(hostAuth);
 		abrirServidorLoja(hostLoja);
@@ -90,31 +91,65 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	// cliente recebe
-	public ChavePubModulo receberChavePubModulo(String nomeCliente) {
+	public ChavesModulo receberChavePubModulo(String nomeCliente) {
 		cifrador.gerarRSA();
 		String chavePri = cifrador.getChavePri();
 		String modulo = cifrador.getModulo();
 		String chavePub = cifrador.getChavePub();
-		String chavePriModulo = chavePri + ":" + modulo;
 		System.out.println("\n\tGateway -> Novo cliente " + nomeCliente);
 		System.out.println("\t\t-> Cliente " + nomeCliente + " com chave privada: " + chavePri);
 		System.out.println("\t\t-> Cliente " + nomeCliente + " com Modulo: " + modulo);
 		System.out.println("\t\t-> Cliente " + nomeCliente + " com chave publica: " + chavePub);
-		this.clienteChave.put(nomeCliente, chavePriModulo);
+
+		ChavesModulo chaveModulo = new ChavesModulo(chavePub, chavePri, modulo);
+		TokenInfo tokenCliente = new TokenInfo(chaveModulo);
+
+		this.tokenClientes.put(nomeCliente, tokenCliente);
 		System.out.println("\t\t-> Cliente " + nomeCliente + " recebeu chave publica e modulo");
 		return cifrador.getChavePubModulo();
 	}
 
 	// recebe chaveAES do cliente criptografada com RSA
 	public void enviarChaveAES(String nomeCliente, String chaveAEScriptograda) {
-		String[] chavePriModulo = clienteChave.get(nomeCliente).split(":");
-		String chavePri = chavePriModulo[0];
-		String modulo = chavePriModulo[1];
+		ChavesModulo chavesProCliente = tokenClientes.get(nomeCliente).getRemenChavesRSA();
+		String chavePri = chavesProCliente.getChavePri();
+		String modulo = chavesProCliente.getModulo();
+
 		System.out.println(
 				"\n\tGateway -> Cliente " + nomeCliente + " enviou ChaveAES criptografada: " + chaveAEScriptograda);
 		String chaveAES = cifrador.descriptografarRSA(chaveAEScriptograda, chavePri, modulo);
 		System.out.println("\t\t-> Cliente " + nomeCliente + " ChaveAES descriptografada: " + chaveAES);
-		this.clienteChave.put(nomeCliente, chaveAES);
+
+		this.tokenClientes.get(nomeCliente).setChaveAES(chaveAES);
+
+	}
+
+	// recebe chavesHmac do cliente criptografada com RSA
+	public void enviarChaveHmac(String nomeCliente, String chaveHmaccriptograda) {
+		ChavesModulo chavesProCliente = tokenClientes.get(nomeCliente).getRemenChavesRSA();
+		String chavePri = chavesProCliente.getChavePri();
+		String modulo = chavesProCliente.getModulo();
+
+		System.out.println(
+				"\n\tGateway -> Cliente " + nomeCliente + " enviou ChaveHmac criptografada: " + chaveHmaccriptograda);
+		String chaveHmac = cifrador.descriptografarRSA(chaveHmaccriptograda, chavePri, modulo);
+		System.out.println("\t\t-> Cliente " + nomeCliente + " ChaveHmac descriptografada: " + chaveHmac);
+
+		this.tokenClientes.get(nomeCliente).setChaveHmac(chaveHmac);
+
+	}
+
+	// recebe chavesRSA do cliente criptografada com RSA
+	public void enviarChavePubModulo(String nomeCliente, ChavesModulo chavePubModulo) {
+		String chavePub = chavePubModulo.getChavePub();
+		String modulo = chavePubModulo.getModulo();
+
+		System.out.println("\n\tGateway -> Cliente " + nomeCliente + " enviou ChavePub: " + chavePub);
+		System.out.println("\t\t-> Cliente " + nomeCliente + " Modulo: " + modulo);
+
+		this.tokenClientes.get(nomeCliente).setDestinChavesRSA(chavePubModulo);
+
+//		System.out.println(this.tokenClientes.get(nomeCliente));
 
 	}
 
@@ -153,8 +188,30 @@ public class ImplServidorGateway implements ServidorGateway {
 		System.out.println("\n\tGateway -> Requisição de " + tipo + " do cliente " + nomeCliente);
 	}
 
-	public Conta fazerLogin(String nomeCliente, Conta conta) throws RemoteException, Exception {
-		String chaveAEScliente = clienteChave.get(nomeCliente);
+	private boolean autentificarHash(String nomeCliente, TokenInfo tokenCliente, String msg, String hashRecebido)
+			throws Exception {
+		String chaveHmac = tokenCliente.getChaveHmac();
+		String hash = cifrador.calcularHmac(chaveHmac, msg);
+		String chavePubCliente = tokenCliente.getDestinChavesRSA().getChavePub();
+		String moduloCliente = tokenCliente.getDestinChavesRSA().getModulo();
+		String hashDescrip = cifrador.descriptografarRSA(hashRecebido, chavePubCliente, moduloCliente);
+
+		if (hash.equals(hashDescrip)) {
+			System.out.println("\n\tGateway -> Usuário " + nomeCliente + " autentificado!");
+			return true;
+		}
+		System.out.println("\n\tGateway -> Usuário " + nomeCliente + " não autentificado!");
+		return false;
+	}
+
+	public Conta fazerLogin(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception {
+		TokenInfo tokenCliente = tokenClientes.get(nomeCliente);
+		String chaveAEScliente = tokenCliente.getChaveAES();
+
+		if (!autentificarHash(nomeCliente, tokenCliente, conta.toString(), hash)) {
+			return null;
+		}
+
 		conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "login");
 		String msgPrivada = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
 		Conta contaLogada = stubAuth.fazerLogin(msgPrivada, conta);
@@ -162,15 +219,22 @@ public class ImplServidorGateway implements ServidorGateway {
 			System.out.println("\t\t-> Logado com sucesso!");
 			contaLogada = cifrador.descriptografar(chaveAES_GateAuth, contaLogada);
 			contaLogada = cifrador.criptografar(chaveAEScliente, contaLogada);
-			clienteChaveLogados.put(nomeCliente, chaveAEScliente);
+			tokenClientesLogados.put(nomeCliente, tokenClientes.get(nomeCliente));
+			tokenClientes.remove(nomeCliente);
 			return contaLogada;
 		}
 		System.out.println("\t\t-> Falha no login, usuario ou senha incorretos!");
 		return null;
 	}
 
-	public Conta fazerCadastro(String nomeCliente, Conta conta) throws RemoteException, Exception {
-		String chaveAEScliente = clienteChave.get(nomeCliente);
+	public Conta fazerCadastro(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception {
+		TokenInfo tokenCliente = tokenClientes.get(nomeCliente);
+		String chaveAEScliente = tokenCliente.getChaveAES();
+
+		if (!autentificarHash(nomeCliente, tokenCliente, conta.toString(), hash)) {
+			return null;
+		}
+
 		conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "cadastro");
 		String msgPrivada = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
 		Conta contaCadastro = stubAuth.fazerCadastro(msgPrivada, conta);
@@ -178,8 +242,8 @@ public class ImplServidorGateway implements ServidorGateway {
 			System.out.println("\t\t-> Cadastrado com sucesso!");
 			contaCadastro = cifrador.descriptografar(chaveAES_GateAuth, contaCadastro);
 			contaCadastro = cifrador.criptografar(chaveAEScliente, contaCadastro);
-			clienteChaveLogados.put(nomeCliente, chaveAEScliente);
-			clienteChave.remove(nomeCliente);
+			tokenClientesLogados.put(nomeCliente, tokenClientes.get(nomeCliente));
+			tokenClientes.remove(nomeCliente);
 			return contaCadastro;
 		}
 		System.out.println("\t\t-> Falha no cadastro!!");
@@ -187,16 +251,21 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	private boolean autentificarLogin(String nomeCliente) {
-		if (clienteChaveLogados.containsKey(nomeCliente)) {
+		if (tokenClientesLogados.containsKey(nomeCliente)) {
 			return true;
 		}
 		System.out.println("\tGateway -> Requisição de " + nomeCliente + " foi rejeitada! Usuario não logado");
 		return false;
 	}
 
-	public Conta removerConta(String nomeCliente, Conta conta) throws RemoteException, Exception {
+	public Conta removerConta(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, conta.toString(), hash)) {
+				return null;
+			}
 			conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "remoção");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
 			Conta contaRemovida = stubAuth.removerConta(msgPrivada, conta);
@@ -216,9 +285,16 @@ public class ImplServidorGateway implements ServidorGateway {
 	// Loja
 
 	// Funcionario only
-	public Veiculo adicionarVeiculo(String nomeCliente, Veiculo veiculo) throws RemoteException, Exception {
+	public Veiculo adicionarVeiculo(String nomeCliente, Veiculo veiculo, String hash)
+			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, veiculo.toString(), hash)) {
+				return null;
+			}
+
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "inserção");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			Veiculo veiculoAdicionado = stubLoja.adicionarVeiculo(msgPrivada, veiculo);
@@ -234,9 +310,15 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	// Funcionario only
-	public Veiculo removerVeiculo(String nomeCliente, Veiculo veiculo) throws RemoteException, Exception {
+	public Veiculo removerVeiculo(String nomeCliente, Veiculo veiculo, String hash) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, veiculo.toString(), hash)) {
+				return null;
+			}
+
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "remoção");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			Veiculo veiculoRemovido = stubLoja.removerVeiculo(msgPrivada, veiculo);
@@ -252,9 +334,16 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	// Funcionario only
-	public Veiculo atualizarVeiculo(String nomeCliente, Veiculo veiculo) throws RemoteException, Exception {
+	public Veiculo atualizarVeiculo(String nomeCliente, Veiculo veiculo, String hash)
+			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, veiculo.toString(), hash)) {
+				return null;
+			}
+
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "atualização");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			Veiculo veiculoAtualizado = stubLoja.atualizarVeiculo(msgPrivada, veiculo);
@@ -269,9 +358,16 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public Veiculo buscarVeiculoRenavam(String nomeCliente, String renavam) throws RemoteException, Exception {
+	public Veiculo buscarVeiculoRenavam(String nomeCliente, String renavam, String hash)
+			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, renavam, hash)) {
+				return null;
+			}
+
 			renavam = requisicaoGateway(nomeCliente, chaveAEScliente, renavam, "busca Renavam", chaveAES_GateLoja);
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			Veiculo veiculoBusca = stubLoja.buscarVeiculoPorRenavam(msgPrivada, renavam);
@@ -286,9 +382,16 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public List<Veiculo> buscarVeiculoModelo(String nomeCliente, String modelo) throws RemoteException, Exception {
+	public List<Veiculo> buscarVeiculoModelo(String nomeCliente, String modelo, String hash)
+			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, modelo, hash)) {
+				return null;
+			}
+
 			modelo = requisicaoGateway(nomeCliente, chaveAEScliente, modelo, "busca modelo", chaveAES_GateLoja);
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			List<Veiculo> veiculoBusca = stubLoja.buscarVeiculoPorModelo(msgPrivada, modelo);
@@ -305,9 +408,15 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public List<Veiculo> listarVeiculos(String nomeCliente) throws RemoteException, Exception {
+	public List<Veiculo> listarVeiculos(String nomeCliente, String mensagem, String hash)
+			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, mensagem, hash)) {
+				return null;
+			}
 			requisicaoGateway(nomeCliente, chaveAEScliente, "listar veículos");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			List<Veiculo> veiculoBusca = stubLoja.getVeiculos(msgPrivada);
@@ -324,9 +433,16 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public List<Veiculo> listarVeiculos(String nomeCliente, String categoria) throws RemoteException, Exception {
+	public List<Veiculo> listarVeiculosC(String nomeCliente, String categoria, String hash)
+			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, categoria, hash)) {
+				return null;
+			}
+
 			requisicaoGateway(nomeCliente, chaveAEScliente, "listar veículos por categoria");
 			categoria = cifrador.descriptografar(chaveAEScliente, categoria);
 			Categoria c = null;
@@ -360,9 +476,14 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public String getQntVeiculo(String nomeCliente) throws RemoteException, Exception {
+	public String getQntVeiculo(String nomeCliente, String mensagem, String hash) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, mensagem, hash)) {
+				return null;
+			}
 			requisicaoGateway(nomeCliente, chaveAEScliente, "quantidade veículos");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			String quantidade = stubLoja.getQntVeiculos(msgPrivada);
@@ -377,9 +498,18 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public Veiculo comprarVeiculo(String nomeCliente, Conta conta, Veiculo veiculo) throws RemoteException, Exception {
+	public Veiculo comprarVeiculo(String nomeCliente, Conta conta, Veiculo veiculo, String hashConta,
+			String hashVeiculo) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, conta.toString(), hashConta)) {
+				return null;
+			}
+			if (!autentificarHash(nomeCliente, tokenCliente, veiculo.toString(), hashVeiculo)) {
+				return null;
+			}
 			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
 			String msgPrivadaLoja = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 
@@ -443,9 +573,19 @@ public class ImplServidorGateway implements ServidorGateway {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	// banco
 
-	public synchronized Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque) throws RemoteException, Exception {
+	public synchronized Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque, String hashConta,
+			String hashSaque) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, conta.toString(), hashConta)) {
+				return null;
+			}
+			if (!autentificarHash(nomeCliente, tokenCliente, valorSaque, hashSaque)) {
+				return null;
+			}
+
 			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
 
 			valorSaque = cifrador.descriptografar(chaveAEScliente, valorSaque);
@@ -485,10 +625,19 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public synchronized Conta fazerDeposito(String nomeCliente, Conta conta, String valorDeposito)
-			throws RemoteException, Exception {
+	public synchronized Conta fazerDeposito(String nomeCliente, Conta conta, String valorDeposito, String hashConta,
+			String hashDeposito) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, conta.toString(), hashConta)) {
+				return null;
+			}
+			if (!autentificarHash(nomeCliente, tokenCliente, valorDeposito, hashDeposito)) {
+				return null;
+			}
+
 			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
 
 			valorDeposito = cifrador.descriptografar(chaveAEScliente, valorDeposito);
@@ -524,12 +673,25 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public synchronized Conta fazerTransferencia(String nomeCliente, Conta contaBeneficente, String valorTransferencia,
-			String emailFavorecido) throws RemoteException, Exception {
+			String emailFavorecido, String hashContaBene, String hashTransf, String hashEmailFavore)
+			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!autentificarHash(nomeCliente, tokenCliente, contaBeneficente.toString(), hashContaBene)) {
+				return null;
+			}
+			if (!autentificarHash(nomeCliente, tokenCliente, valorTransferencia, hashTransf)) {
+				return null;
+			}
+			if (!autentificarHash(nomeCliente, tokenCliente, emailFavorecido, hashEmailFavore)) {
+				return null;
+			}
+
 			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
 
-			Conta contaFavorecido = buscarConta(nomeCliente, emailFavorecido);
+			Conta contaFavorecido = buscarConta(nomeCliente, emailFavorecido, hashEmailFavore);
 			if (contaFavorecido == null) {
 				System.out.println("\t\t-> Conta favorecido não encontrada");
 				return null;
@@ -537,7 +699,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			contaFavorecido = cifrador.descriptografar(chaveAEScliente, contaFavorecido);
 
 			String emailBeneficente = contaBeneficente.getEmail();
-			contaBeneficente = buscarConta(nomeCliente, emailBeneficente);
+			contaBeneficente = buscarConta(nomeCliente, emailBeneficente, "eupodo");
 			if (contaBeneficente == null) {
 				System.out.println("\t\t-> Conta beneficente não encontrada");
 				return null;
@@ -580,9 +742,17 @@ public class ImplServidorGateway implements ServidorGateway {
 		return null;
 	}
 
-	public Conta buscarConta(String nomeCliente, String emailConta) throws RemoteException, Exception {
+	public Conta buscarConta(String nomeCliente, String emailConta, String hash) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
-			String chaveAEScliente = clienteChaveLogados.get(nomeCliente);
+			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
+			String chaveAEScliente = tokenCliente.getChaveAES();
+
+			if (!hash.equals("eupodo")) {
+				if (!autentificarHash(nomeCliente, tokenCliente, emailConta, hash)) {
+					return null;
+				}
+			}
+
 			String msgPrivadaAuth = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
 
 			emailConta = requisicaoGateway(nomeCliente, chaveAEScliente, emailConta, "buscar conta", chaveAES_GateAuth);
@@ -620,7 +790,7 @@ public class ImplServidorGateway implements ServidorGateway {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
 				stubGateway = (ServidorGateway) registro.lookup("ServidorGateway");
 
-				ChavePubModulo chavePubModulo = stubGateway.receberChavePubModulo(nome);
+				ChavesModulo chavePubModulo = stubGateway.receberChavePubModulo(nome);
 				System.out.println(chavePubModulo);
 				String chaveAES = Cifrador.gerarStringAleatoria(16);
 				cifrador = new Cifrador(chaveAES);
@@ -640,7 +810,8 @@ public class ImplServidorGateway implements ServidorGateway {
 
 		Conta conta = new Conta("brennokm@gmail.com", "qwe123");
 		conta = cifrador.criptografar(cifrador.getChaveAES(), conta);
-		contaLogada = stubGateway.fazerLogin(nome, conta);
+
+		contaLogada = stubGateway.fazerLogin(nome, conta, null);
 		Thread.sleep(500);
 		contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaLogada);
 		System.out.println("Conta logada: " + contaLogada);
@@ -652,7 +823,7 @@ public class ImplServidorGateway implements ServidorGateway {
 		Thread.sleep(500);
 		System.out.println("conta cifrada: " + contaCifrada);
 		System.out.println("Veiculo cifrado: " + v);
-		Veiculo veiculoComprado = stubGateway.comprarVeiculo(nome, contaCifrada, v);
+		Veiculo veiculoComprado = stubGateway.comprarVeiculo(nome, contaCifrada, v, null, null);
 		System.out.println("Veiculo comprado " + veiculoComprado);
 	}
 }

@@ -23,7 +23,7 @@ public class RSA {
 		// phi(n) = (p – 1) * (q – 1).
 		BigInteger phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
 
-		chavePub = BigInteger.probablePrime(32, random); // mdc(chavePub, phi(modulo)) = 1 
+		chavePub = BigInteger.probablePrime(bits/2, random); // mdc(chavePub, phi(modulo)) = 1 
 		chavePri = chavePub.modInverse(phi); //  chavePri*chavePub mod phi(modulo) = 1
 	}
 	public String criptografar(String mensagem) {

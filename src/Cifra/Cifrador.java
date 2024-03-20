@@ -6,7 +6,7 @@ import Modelos.Conta;
 import Modelos.Veiculo;
 
 public class Cifrador {
-	private String chaveAES;
+	private String chaveAES, chaveHmac;
 	private RSA rsa;
 	private String chavePub, modulo;
 
@@ -45,7 +45,25 @@ public class Cifrador {
 		String descripAES = CifraAES.descriptografar(chaveAES, conteudo);
 		return descripAES;
 	}
+	
+	public String calcularHmac(String mensagem) throws Exception {
+		return Hmac.calcular(chaveHmac, mensagem);
+	}
 
+	public boolean autentificarMensagem(String descriptVigenere, String hmacRecebido)
+			throws Exception {
+		return Hmac.verificar(chaveHmac, descriptVigenere, hmacRecebido);
+	}
+
+	public String calcularHmac(String chaveHmac, String mensagem) throws Exception {
+		return Hmac.calcular(chaveHmac, mensagem);
+	}
+
+	public boolean autentificarMensagem(String chaveHmac, String descriptVigenere, String hmacRecebido)
+			throws Exception {
+		return Hmac.verificar(chaveHmac, descriptVigenere, hmacRecebido);
+	}
+	
 	public String criptografarRSA(String mensagem) {
 		return rsa.criptografar(mensagem);
 	}
@@ -58,12 +76,20 @@ public class Cifrador {
 		return RSA.descriptografar(mensagem, chavePri, modulo);
 	}
 
-	public String criptografarRSA(String mensagem, ChavePubModulo chavePubModulo) {
-		return RSA.criptografar(mensagem, chavePubModulo.getChavePub(), chavePubModulo.getModulo());
+	public String criptografarRSA(String mensagem, ChavesModulo chaveModulo) {
+		return RSA.criptografar(mensagem, chaveModulo.getChavePub(), chaveModulo.getModulo());
+	}
+	
+	public String descriptografarRSA(String mensagem, ChavesModulo chaveModulo) {
+		return RSA.criptografar(mensagem, chaveModulo.getChavePri(), chaveModulo.getModulo());
 	}
 
 	public String getChaveAES() {
 		return this.chaveAES;
+	}
+	
+	public void setChaveAES(String chaveAES) {
+		this.chaveAES = chaveAES;
 	}
 
 	public String getChavePub() {
@@ -76,6 +102,14 @@ public class Cifrador {
 
 	public String getChavePri() {
 		return rsa.getChavePri();
+	}
+
+	public String getChaveHmac() {
+		return chaveHmac;
+	}
+
+	public void setChaveHmac(String chaveHmac) {
+		this.chaveHmac = chaveHmac;
 	}
 
 	public Conta criptografar(String chaveAES, Conta conta) throws Exception {
@@ -197,8 +231,8 @@ public class Cifrador {
 		return null;
 	}
 
-	public ChavePubModulo getChavePubModulo() {
-		ChavePubModulo cpm = new ChavePubModulo(getChavePub(), getModulo());
+	public ChavesModulo getChavePubModulo() {
+		ChavesModulo cpm = new ChavesModulo(getChavePub(), getModulo());
 		return cpm;
 	}
 

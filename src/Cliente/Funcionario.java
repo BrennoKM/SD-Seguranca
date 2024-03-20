@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import Cifra.Cifrador;
 import Modelos.Conta;
+import Modelos.TokenInfo;
 import Modelos.Veiculo;
 import Modelos.Veiculo.Categoria;
 import Modelos.Categorias.Economico;
@@ -18,9 +19,9 @@ public class Funcionario extends Usuario {
 //	private Conta contaLogada = null;
 //	private Scanner in = new Scanner(System.in);
 
-	public Funcionario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem)
+	public Funcionario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem, TokenInfo tokenServidor)
 			throws RemoteException, Exception {
-		super(nome, stubGateway, cifrador, contaLogada, mensagem);
+		super(nome, stubGateway, cifrador, contaLogada, mensagem, tokenServidor);
 	}
 
 	public boolean iniciar() {
@@ -83,7 +84,8 @@ public class Funcionario extends Usuario {
 		String renavam = in.nextLine();
 		Veiculo veiculo = new Economico(renavam);
 		veiculo = cifrador.criptografar(cifrador.getChaveAES(), veiculo);
-		veiculo = stubGateway.removerVeiculo(this.nome, veiculo);
+		String hashVeiculo = assinarMsg(veiculo.toString());
+		veiculo = stubGateway.removerVeiculo(this.nome, veiculo, hashVeiculo);
 		if (veiculo != null) {
 			veiculo = cifrador.descriptografar(cifrador.getChaveAES(), veiculo);
 			System.out.println("Removido com sucesso: " + veiculo);
@@ -95,7 +97,8 @@ public class Funcionario extends Usuario {
 		Veiculo veiculo = criarVeiculo();
 		if (veiculo != null) {
 			veiculo = cifrador.criptografar(cifrador.getChaveAES(), veiculo);
-			veiculo = stubGateway.adicionarVeiculo(this.nome, veiculo);
+			String hashVeiculo = assinarMsg(veiculo.toString());
+			veiculo = stubGateway.adicionarVeiculo(this.nome, veiculo, hashVeiculo);
 		}
 		if (veiculo != null) {
 			veiculo = cifrador.descriptografar(cifrador.getChaveAES(), veiculo);
@@ -169,13 +172,16 @@ public class Funcionario extends Usuario {
 				Veiculo veiculoRemover = Veiculo.newVeiculo(veiculo);
 				veiculoRemover.setRenavam(renavamOriginal);
 				veiculoRemover = cifrador.criptografar(cifrador.getChaveAES(), veiculoRemover);
-				stubGateway.removerVeiculo(nome, veiculoRemover);
+				String hashVeiculoRem = assinarMsg(veiculoRemover.toString());
+				stubGateway.removerVeiculo(nome, veiculoRemover, hashVeiculoRem);
 				veiculo = cifrador.criptografar(cifrador.getChaveAES(), veiculo);
-				veiculo = stubGateway.adicionarVeiculo(this.nome, veiculo);
+				String hashVeiculo = assinarMsg(veiculo.toString());
+				veiculo = stubGateway.adicionarVeiculo(this.nome, veiculo, hashVeiculo);
 
 			} else {
 				veiculo = cifrador.criptografar(cifrador.getChaveAES(), veiculo);
-				veiculo = stubGateway.atualizarVeiculo(this.nome, veiculo);
+				String hashVeiculo = assinarMsg(veiculo.toString());
+				veiculo = stubGateway.atualizarVeiculo(this.nome, veiculo, hashVeiculo);
 			}
 		}
 		if (veiculo != null) {

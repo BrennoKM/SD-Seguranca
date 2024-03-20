@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import Cifra.Cifrador;
 import Modelos.Conta;
+import Modelos.TokenInfo;
 import Modelos.Veiculo;
 import Modelos.Categorias.Economico;
 import ServidorInterface.ServidorGateway;
@@ -16,15 +17,29 @@ public class Usuario {
 	protected ServidorGateway stubGateway;
 	protected Cifrador cifrador;
 	protected Conta contaLogada = null;
+	protected TokenInfo tokenServidor;
 	protected Scanner in = new Scanner(System.in);
 
-	public Usuario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem)
+	public Usuario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem, TokenInfo tokenServidor)
 			throws RemoteException, Exception {
 		System.out.println(mensagem);
 		this.nome = nome;
 		this.stubGateway = stubGateway;
 		this.cifrador = cifrador;
 		this.contaLogada = contaLogada;
+		this.tokenServidor = tokenServidor;
+	}
+	
+	protected String assinarMsg(String msg) throws Exception {
+		String hashAssinado;
+		String msgHash;
+		String minhaChavePri;
+		String meuModulo;
+		msgHash = cifrador.calcularHmac(msg);
+		minhaChavePri = tokenServidor.getRemenChavesRSA().getChavePri();
+		meuModulo = tokenServidor.getRemenChavesRSA().getModulo();
+		hashAssinado = cifrador.criptografarRSA(msgHash, minhaChavePri, meuModulo);
+		return hashAssinado;
 	}
 
 	protected int obterInt(int i, int j) {
@@ -139,8 +154,9 @@ public class Usuario {
 
 		valorSaque = cifrador.criptografar(valorSaque);
 		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
-
-		conta = stubGateway.fazerSaque(nome, conta, valorSaque);
+		String hashConta = assinarMsg(conta.toString());
+		String hashSaque = assinarMsg(valorSaque);
+		conta = stubGateway.fazerSaque(nome, conta, valorSaque, hashConta, hashSaque);
 		if (conta != null) {
 			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), conta);
 			System.out.println("Saque feito, novo saldo é: " + contaLogada.getSaldo());
@@ -155,8 +171,9 @@ public class Usuario {
 
 		valorDeposito = cifrador.criptografar(valorDeposito);
 		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
-
-		conta = stubGateway.fazerDeposito(nome, conta, valorDeposito);
+		String hashConta = assinarMsg(conta.toString());
+		String hashDeposito = assinarMsg(valorDeposito);
+		conta = stubGateway.fazerDeposito(nome, conta, valorDeposito, hashConta, hashDeposito);
 		if (conta != null) {
 			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), conta);
 			System.out.println("Deposito feito, novo saldo é: " + contaLogada.getSaldo());
@@ -176,7 +193,11 @@ public class Usuario {
 		emailFavorecido = cifrador.criptografar(emailFavorecido);
 		Conta contaBeneficente = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
 
-		contaBeneficente = stubGateway.fazerTransferencia(nome, contaBeneficente, valorTransferencia, emailFavorecido);
+		String hashBene = assinarMsg(contaBeneficente.toString());
+		String hashTransfe = assinarMsg(valorTransferencia);
+		String hashEmailFavore = assinarMsg(emailFavorecido);
+		
+		contaBeneficente = stubGateway.fazerTransferencia(nome, contaBeneficente, valorTransferencia, emailFavorecido, hashBene, hashTransfe, hashEmailFavore);
 		if (contaBeneficente != null) {
 			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaBeneficente);
 			System.out.println("Transferência feita, novo saldo é: " + contaLogada.getSaldo());
@@ -188,7 +209,10 @@ public class Usuario {
 	protected void verMinhaconta() throws RemoteException, Exception {
 		String email = contaLogada.getEmail();
 		email = cifrador.criptografar(email);
-		Conta contaBusca = stubGateway.buscarConta(nome, email);
+
+		String hashEmail = assinarMsg(email);
+		
+		Conta contaBusca = stubGateway.buscarConta(nome, email, hashEmail);
 		if (contaBusca != null) {
 			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaBusca);
 			System.out.println("Meus dados: " + contaLogada);
@@ -223,8 +247,11 @@ public class Usuario {
 	}
 
 	protected void getQntVeiculos() throws RemoteException, Exception {
+		String msg = cifrador.criptografar("mensagem");
+		String hashMsg = assinarMsg(msg);
+		
 		System.out.println(
-				"Quantidade total de veículos: " + cifrador.descriptografar(stubGateway.getQntVeiculo(this.nome)));
+				"Quantidade total de veículos: " + cifrador.descriptografar(stubGateway.getQntVeiculo(this.nome, msg, hashMsg)));
 	}
 
 	protected void comprarVeiculo() throws RemoteException, Exception {
@@ -233,7 +260,12 @@ public class Usuario {
 		Veiculo veiculoCompra = new Economico(renavamCompra);
 		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
 		veiculoCompra = cifrador.criptografar(cifrador.getChaveAES(), veiculoCompra);
-		veiculoCompra = stubGateway.comprarVeiculo(this.nome, conta, veiculoCompra);
+		
+
+		String hashConta = assinarMsg(conta.toString());
+		String hashVeiculo = assinarMsg(veiculoCompra.toString());
+		
+		veiculoCompra = stubGateway.comprarVeiculo(this.nome, conta, veiculoCompra, hashConta, hashVeiculo);
 		if (veiculoCompra != null) {
 			veiculoCompra = cifrador.descriptografar(cifrador.getChaveAES(), veiculoCompra);
 			System.out.println("Veículo comprado com sucesso: " + veiculoCompra);
@@ -247,7 +279,8 @@ public class Usuario {
 		System.out.println("Digite o modelo: ");
 		String modelo = in.nextLine();
 		modelo = cifrador.criptografar(modelo);
-		List<Veiculo> veiculos = stubGateway.buscarVeiculoModelo(this.nome, modelo);
+		String hashModelo = assinarMsg(modelo);
+		List<Veiculo> veiculos = stubGateway.buscarVeiculoModelo(this.nome, modelo, hashModelo);
 		if (veiculos != null) {
 			System.out.println("Veículos encontrados da categoria escolhida: ");
 			for (Veiculo veiculo : veiculos) {
@@ -263,7 +296,8 @@ public class Usuario {
 		System.out.println("Digite o renavam: ");
 		String renavam = in.nextLine();
 		renavam = cifrador.criptografar(renavam);
-		Veiculo veiculo = stubGateway.buscarVeiculoRenavam(this.nome, renavam);
+		String hashRenavam = assinarMsg(renavam);
+		Veiculo veiculo = stubGateway.buscarVeiculoRenavam(this.nome, renavam, hashRenavam);
 		if (veiculo != null) {
 			veiculo = cifrador.descriptografar(cifrador.getChaveAES(), veiculo);
 			System.out.println("Veículos encontrado: " + veiculo);
@@ -286,7 +320,8 @@ public class Usuario {
 			categoriaString = "EXECUTIVO";
 		}
 		String categoriaCifrada = cifrador.criptografar(categoriaString);
-		List<Veiculo> veiculos = stubGateway.listarVeiculos(this.nome, categoriaCifrada);
+		String hashCategoria = assinarMsg(categoriaCifrada);
+		List<Veiculo> veiculos = stubGateway.listarVeiculosC(this.nome, categoriaCifrada, hashCategoria);
 		if (veiculos != null) {
 			System.out.println("Veículos encontrados da categoria escolhida: ");
 			for (Veiculo veiculo : veiculos) {
@@ -299,7 +334,10 @@ public class Usuario {
 	}
 
 	protected void listarVeiculos() throws RemoteException, Exception {
-		List<Veiculo> veiculos = stubGateway.listarVeiculos(this.nome);
+		String msg = cifrador.criptografar("mensagem");
+		String hashMsg = assinarMsg(msg);
+		
+		List<Veiculo> veiculos = stubGateway.listarVeiculos(this.nome, msg, hashMsg);
 		if (veiculos != null) {
 			System.out.println("Veículos encontrados:");
 			for (Veiculo veiculo : veiculos) {

@@ -8,6 +8,7 @@ public class IniciarServidores{
 	static String hostGateway = "localhost";
 	static String hostAuth = "localhost";
 	static String hostLoja = "localhost";
+	
 	public static void main(String[] args) throws Exception {
 		
 		// só pode ser iniciado uma vez
