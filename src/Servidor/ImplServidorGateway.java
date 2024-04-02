@@ -29,11 +29,11 @@ public class ImplServidorGateway implements ServidorGateway {
 	private Map<String, TokenInfo> tokenClientes = new HashMap<>();
 	private Map<String, TokenInfo> tokenClientesLogados = new HashMap<>();
 
-	public ImplServidorGateway(String hostAuth, String hostLoja) throws Exception {
+	public ImplServidorGateway(String hostAuth, String hostLoja, int porta) throws Exception {
 		this.tokenClientes = new HashMap<>();
 		cifrador = new Cifrador();
-		abrirServidorAutentificacao(hostAuth);
-		abrirServidorLoja(hostLoja);
+		abrirServidorAutentificacao(hostAuth, porta);
+		abrirServidorLoja(hostLoja, porta);
 		// fazerLogin("brennokm@gmail.com", "qwe123");
 	}
 
@@ -45,8 +45,8 @@ public class ImplServidorGateway implements ServidorGateway {
 		 */
 	}
 
-	private void abrirServidorLoja(String host) throws Exception {
-		int porta = 50007;
+	private void abrirServidorLoja(String host, int porta) throws Exception {
+		porta = porta + 2;
 		config();
 		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de autentificação: ");
@@ -67,8 +67,8 @@ public class ImplServidorGateway implements ServidorGateway {
 		}
 	}
 
-	private void abrirServidorAutentificacao(String host) throws Exception {
-		int porta = 50006;
+	private void abrirServidorAutentificacao(String host, int porta) throws Exception {
+		porta = porta + 1;
 		config();
 		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de loja: ");

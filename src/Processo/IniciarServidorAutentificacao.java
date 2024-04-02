@@ -8,7 +8,7 @@ import Servidor.ImplServidorAutentificacao;
 import ServidorInterface.ServidorAutentificacao;
 
 public class IniciarServidorAutentificacao {
-	private static final int porta = 50005;
+	private static int porta = 1099;
 	
 	private void config(String host) {
 		System.setProperty("java.rmi.server.hostname", host);
@@ -20,7 +20,8 @@ public class IniciarServidorAutentificacao {
 
 	}
 	
-	public IniciarServidorAutentificacao(String hostAuth) {
+	public IniciarServidorAutentificacao(String hostAuth, int porta) {
+		this.porta = porta;
 		config(hostAuth);
 		int modificadorPorta = 1;
 		try {
@@ -28,8 +29,8 @@ public class IniciarServidorAutentificacao {
 			ImplServidorAutentificacao refObjetoRemoto = new ImplServidorAutentificacao();
 			ServidorAutentificacao skeleton = (ServidorAutentificacao) UnicastRemoteObject.exportObject(refObjetoRemoto,
 					0);
-			LocateRegistry.createRegistry(porta + modificadorPorta);
-			Registry registro = LocateRegistry.getRegistry(porta + modificadorPorta);
+			LocateRegistry.createRegistry(this.porta + modificadorPorta);
+			Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
 			registro.bind("ServidorAutentificacao", skeleton);
 			System.out.println(
 					"Servidor de autentificação está no ar. host=" + hostAuth + " porta=" + (porta + modificadorPorta));

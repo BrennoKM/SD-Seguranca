@@ -8,13 +8,14 @@ import Servidor.ImplServidorGateway;
 import ServidorInterface.ServidorGateway;
 
 public class IniciarServidorGateway {
-	private static final int porta = 50005;
+	private int porta = 1099;
 
-	public IniciarServidorGateway(String hostGateway, String hostAuth, String hostLoja) {
+	public IniciarServidorGateway(String hostGateway, String hostAuth, String hostLoja, int porta) {
+		this.porta = porta;
 
 //		iniciarServidorAutentificacao(hostAuth);
 //		iniciarServidorLoja(hostLoja);
-		iniciarServidorGateway(hostGateway, hostAuth, hostLoja);
+		iniciarServidorGateway(hostGateway, hostAuth, hostLoja, this.porta);
 	}
 
 	public void config(String host) {
@@ -29,12 +30,12 @@ public class IniciarServidorGateway {
 
 	
 
-	private void iniciarServidorGateway(String hostGate, String hostAuth, String hostLoja) {
+	private void iniciarServidorGateway(String hostGate, String hostAuth, String hostLoja, int porta) {
 		config(hostGate);
 		int modificadorPorta = 0;
 		try {
 			// criar objeto servidor
-			ImplServidorGateway refObjetoRemoto = new ImplServidorGateway(hostAuth, hostLoja);
+			ImplServidorGateway refObjetoRemoto = new ImplServidorGateway(hostAuth, hostLoja, porta);
 			ServidorGateway skeleton = (ServidorGateway) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
 			LocateRegistry.createRegistry(porta + modificadorPorta);
 			Registry registro = LocateRegistry.getRegistry(porta + modificadorPorta);
@@ -47,6 +48,6 @@ public class IniciarServidorGateway {
 	}
 
 	public static void main(String[] args) {
-		new IniciarServidorGateway("localhost", "localhost", "localhost");
+		new IniciarServidorGateway("localhost", "localhost", "localhost", 1099);
 	}
 }
