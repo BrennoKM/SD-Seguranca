@@ -40,6 +40,7 @@ public class ClienteGateway {
 		// System.out.println("Informe o endereço do serviço de gateway: ");
 		// String host = entrada.nextLine();
 //		String host = "localhost";
+		
 		boolean conectou = false;
 		while (!conectou) {
 			try {
