@@ -28,17 +28,18 @@ public class IniciarServidorGateway {
 
 	}
 
-	
 
-	private void iniciarServidorGateway(String hostGate, String hostAuth, String hostLoja, int porta) {
+
+	private void iniciarServidorGateway(String hostGate, String hostAuth, String hostReplicas, int porta) {
 		config(hostGate);
 		int modificadorPorta = 0;
 		try {
 			// criar objeto servidor
-			ImplServidorGateway refObjetoRemoto = new ImplServidorGateway(hostAuth, hostLoja, porta);
+			ImplServidorGateway refObjetoRemoto = new ImplServidorGateway(hostAuth, hostReplicas, porta);
 			ServidorGateway skeleton = (ServidorGateway) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
 			LocateRegistry.createRegistry(porta + modificadorPorta);
 			Registry registro = LocateRegistry.getRegistry(porta + modificadorPorta);
+			System.out.println("Registro: " + registro);
 			registro.bind("ServidorGateway", skeleton);
 			System.out.println("Servidor de gateway está no ar. host=" + hostGate + " porta=" + (porta + modificadorPorta));
 		} catch (Exception e) {

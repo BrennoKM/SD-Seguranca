@@ -8,6 +8,7 @@ import Modelos.Veiculo;
 import Modelos.Veiculo.Categoria;
 
 public interface ServidorLoja extends Remote {
+	boolean testarConexao() throws RemoteException, Exception;
 	Veiculo buscarVeiculoPorRenavam(String mensagem, String renavam) throws RemoteException, Exception;
 	List<Veiculo> buscarVeiculoPorModelo(String mensagem, String modelo) throws RemoteException, Exception;
 	List<Veiculo> getVeiculos(String mensagem) throws RemoteException, Exception;

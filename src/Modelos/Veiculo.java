@@ -40,7 +40,7 @@ public abstract class Veiculo implements Serializable {
 	}
 
 	public Veiculo() {
-		
+
 	}
 
 	public static Veiculo newVeiculo(Veiculo veiculo) {

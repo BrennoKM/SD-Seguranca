@@ -56,7 +56,7 @@ public class TokenInfo {
 		return "TokenInfo [remenChavesRSA=\n\t" + remenChavesRSA + ", \n\tdestinChavesRSA=" + destinChavesRSA + ", \n\tchaveHmac="
 				+ chaveHmac + ", \n\tchaveAES=" + chaveAES + "]";
 	}
-	
-	
+
+
 
 }

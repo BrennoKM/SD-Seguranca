@@ -9,65 +9,65 @@ import Cifra.Cifrador;
 import Modelos.Conta;
 
 public class ContaManager implements Serializable{
-	private static final long serialVersionUID = 1L;
-	private Map<String, Conta> mapaContas;
+    private static final long serialVersionUID = 1L;
+    private Map<String, Conta> mapaContas;
     private final String arquivo = "contas.ser";
-//	private String chaveAES = "chaveAESdobd1234";
+    //	private String chaveAES = "chaveAESdobd1234";
     private Cifrador cifrador;
-    
+
     public ContaManager(String chaveAES) throws Exception {
         mapaContas = new HashMap<>();
-		cifrador = new Cifrador(chaveAES);
-		carregarLista();
+        cifrador = new Cifrador(chaveAES);
+        carregarLista();
     }
-   
+
 
     public synchronized Conta adicionarConta(String email, Conta conta) throws Exception {
-    	Conta contaBusca = buscarConta(email);
-    	if(contaBusca == null) {
-    		mapaContas.put(email, conta);
-    		salvarLista();
-    		carregarLista();
-    		contaBusca = buscarConta(email);
-    		return contaBusca;
-    	}
+        Conta contaBusca = buscarConta(email);
+        if(contaBusca == null) {
+            mapaContas.put(email, conta);
+            salvarLista();
+            carregarLista();
+            contaBusca = buscarConta(email);
+            return contaBusca;
+        }
         return null;
     }
 
     public synchronized Conta buscarConta(String email) throws Exception {
 //    	salvarLista(); // não salvar na busca
-    	carregarLista();
-    	if (mapaContas.containsKey(email)) {
-	    	Conta conta = mapaContas.get(email);
-	        return conta;
-    	}
-    	return null;
+        carregarLista();
+        if (mapaContas.containsKey(email)) {
+            Conta conta = mapaContas.get(email);
+            return conta;
+        }
+        return null;
     }
 
     public synchronized Conta removerConta(String email) throws Exception {
-    	carregarLista();
-    	if (mapaContas.containsKey(email)) {
-    		Conta contaRemovida = mapaContas.remove(email);
+        carregarLista();
+        if (mapaContas.containsKey(email)) {
+            Conta contaRemovida = mapaContas.remove(email);
             salvarLista();
             carregarLista();
-        	return contaRemovida;
+            return contaRemovida;
         }
-		return null;
-        
+        return null;
+
     }
 
     public synchronized Conta atualizarConta(String email, Conta conta) throws Exception {
         if (mapaContas.containsKey(email)) {
-        	removerConta(email);
-        	Conta contaAtualizada = adicionarConta(conta.getEmail(), conta);
-        	salvarLista();
-        	carregarLista();
-        	contaAtualizada = buscarConta(email);
-        	return contaAtualizada;
+            removerConta(email);
+            Conta contaAtualizada = adicionarConta(conta.getEmail(), conta);
+            salvarLista();
+            carregarLista();
+            contaAtualizada = buscarConta(email);
+            return contaAtualizada;
         }
-		return null;
+        return null;
     }
-    
+
     @SuppressWarnings("unchecked")
     public synchronized void carregarLista() throws Exception {
         try (FileInputStream fileIn = new FileInputStream(arquivo);
@@ -77,9 +77,9 @@ public class ContaManager implements Serializable{
                 String numeroConta = entry.getKey();
                 Conta conta = entry.getValue();
                 Conta contaDescriptografada = cifrador.descriptografar(cifrador.getChaveAES(), conta);
-                mapaContas.put(numeroConta, contaDescriptografada); 
+                mapaContas.put(numeroConta, contaDescriptografada);
             }
-            
+
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -89,11 +89,11 @@ public class ContaManager implements Serializable{
     public synchronized void salvarLista() throws Exception {
         try (FileOutputStream fileOut = new FileOutputStream(arquivo);
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-        	for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
-        		Conta conta = entry.getValue();
-        		conta = cifrador.criptografar(cifrador.getChaveAES(), conta);
-        		//conta.setEmail(cifrador.criptografar(conta.getEmail()));
-            	//conta.setSenha(cifrador.criptografar(conta.getSenha()));
+            for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
+                Conta conta = entry.getValue();
+                conta = cifrador.criptografar(cifrador.getChaveAES(), conta);
+                //conta.setEmail(cifrador.criptografar(conta.getEmail()));
+                //conta.setSenha(cifrador.criptografar(conta.getSenha()));
             }
             out.writeObject(mapaContas);
             //System.out.println("Lista de contas salva em: " + new File(arquivo).getAbsolutePath());
@@ -102,37 +102,37 @@ public class ContaManager implements Serializable{
         }
 //        descriptografarLista();
     }
-    
+
     public synchronized void criptografarLista() throws Exception {
-    	for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
-    		Conta conta = entry.getValue();
-    		conta = cifrador.criptografar(cifrador.getChaveAES(), conta);
+        for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
+            Conta conta = entry.getValue();
+            conta = cifrador.criptografar(cifrador.getChaveAES(), conta);
         }
     }
-    
+
     public synchronized void descriptografarLista() throws Exception {
-    	for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
-    		Conta conta = entry.getValue();
-    		conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
+        for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
+            Conta conta = entry.getValue();
+            conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
         }
     }
-    
+
     public void printContas() {
-    	System.out.println("\n\n");
-		for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
-			System.out.println("key: " + entry.getKey() +"	value -> "+ entry.getValue());
+        System.out.println("\n\n");
+        for (Map.Entry<String, Conta> entry : mapaContas.entrySet()) {
+            System.out.println("key: " + entry.getKey() +"	value -> "+ entry.getValue());
         }
-		
-	}
+
+    }
 
     public synchronized Map<String, Conta> getMapaContas(){
-    	return this.mapaContas;
+        return this.mapaContas;
     }
-    
+
     public static void main(String[] args) throws Exception {
-		final String chaveAES = "chaveAESdobd1234";
+        final String chaveAES = "chaveAESdobd1234";
         ContaManager manager = new ContaManager(chaveAES);
-        
+
         // Carregar lista do arquivo
         //manager.carregarLista();
 

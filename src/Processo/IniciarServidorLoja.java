@@ -21,16 +21,17 @@ public class IniciarServidorLoja {
 
 	}
 
-	public IniciarServidorLoja(String hostLoja, int porta) {
+	public IniciarServidorLoja(String hostLoja, int porta, String arquivo) {
 		this.porta = porta;
 		config(hostLoja);
-		int modificadorPorta = 2;
+		int modificadorPorta = 3;
 		try {
 			// criar objeto servidor
-			ImplServidorLoja refObjetoRemoto = new ImplServidorLoja();
+			ImplServidorLoja refObjetoRemoto = new ImplServidorLoja(arquivo);
 			ServidorLoja skeleton = (ServidorLoja) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
 			LocateRegistry.createRegistry(this.porta + modificadorPorta);
 			Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
+			System.out.println("Registro: " + registro);
 			registro.bind("ServidorLoja", skeleton);
 			System.out
 					.println("Servidor de veiculos está no ar. host=" + hostLoja + " porta=" + (porta + modificadorPorta));

@@ -29,7 +29,7 @@ public class Usuario {
 		this.contaLogada = contaLogada;
 		this.tokenServidor = tokenServidor;
 	}
-	
+
 	protected String assinarMsg(String msg) throws Exception {
 		String hashAssinado;
 		String msgHash;
@@ -85,32 +85,32 @@ public class Usuario {
 					+ "\n\t6 - Comprar veículo \n\t7 - Ver dados da minha conta \n\t8 - Sair \n\t0 - Acessar conta bancária");
 			opcao = obterInt(0, 8);
 			switch (opcao) {
-			case 0:
-				acessarBanco();
-			case 1:
-				listarVeiculos();
-				break;
-			case 2:
-				listarVeiculosCategoria();
-				break;
-			case 3:
-				buscarVeiculoRenavam();
-				break;
-			case 4:
-				buscarVeiculoModelo();
-				break;
-			case 5:
-				getQntVeiculos();
-				break;
-			case 6:
-				comprarVeiculo();
-				break;
-			case 7:
-				verMinhaconta();
-				break;
-			case 8:
-				System.out.println("Deslogando...");
-				break;
+				case 0:
+					acessarBanco();
+				case 1:
+					listarVeiculos();
+					break;
+				case 2:
+					listarVeiculosCategoria();
+					break;
+				case 3:
+					buscarVeiculoRenavam();
+					break;
+				case 4:
+					buscarVeiculoModelo();
+					break;
+				case 5:
+					getQntVeiculos();
+					break;
+				case 6:
+					comprarVeiculo();
+					break;
+				case 7:
+					verMinhaconta();
+					break;
+				case 8:
+					System.out.println("Deslogando...");
+					break;
 
 			}
 		}
@@ -125,24 +125,24 @@ public class Usuario {
 							+ "\n\t4 - Visualizar minha conta \n\t5 - Simular investimentos \n\t6 - Sair do banco");
 			int opcaoBanco = obterInt(1, 6);
 			switch (opcaoBanco) {
-			case 1:
-				fazerSaque();
-				break;
-			case 2:
-				fazerDeposito();
-				break;
-			case 3:
-				fazerTransferencia();
-				break;
-			case 4:
-				verMinhaconta();
-				break;
-			case 5:
-				simularInvestimentos();
-				break;
-			case 6:
-				usandoBanco = false;
-				break;
+				case 1:
+					fazerSaque();
+					break;
+				case 2:
+					fazerDeposito();
+					break;
+				case 3:
+					fazerTransferencia();
+					break;
+				case 4:
+					verMinhaconta();
+					break;
+				case 5:
+					simularInvestimentos();
+					break;
+				case 6:
+					usandoBanco = false;
+					break;
 			}
 		}
 
@@ -196,7 +196,7 @@ public class Usuario {
 		String hashBene = assinarMsg(contaBeneficente.toString());
 		String hashTransfe = assinarMsg(valorTransferencia);
 		String hashEmailFavore = assinarMsg(emailFavorecido);
-		
+
 		contaBeneficente = stubGateway.fazerTransferencia(nome, contaBeneficente, valorTransferencia, emailFavorecido, hashBene, hashTransfe, hashEmailFavore);
 		if (contaBeneficente != null) {
 			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaBeneficente);
@@ -211,7 +211,7 @@ public class Usuario {
 		email = cifrador.criptografar(email);
 
 		String hashEmail = assinarMsg(email);
-		
+
 		Conta contaBusca = stubGateway.buscarConta(nome, email, hashEmail);
 		if (contaBusca != null) {
 			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaBusca);
@@ -249,7 +249,7 @@ public class Usuario {
 	protected void getQntVeiculos() throws RemoteException, Exception {
 		String msg = cifrador.criptografar("mensagem");
 		String hashMsg = assinarMsg(msg);
-		
+
 		System.out.println(
 				"Quantidade total de veículos: " + cifrador.descriptografar(stubGateway.getQntVeiculo(this.nome, msg, hashMsg)));
 	}
@@ -260,11 +260,11 @@ public class Usuario {
 		Veiculo veiculoCompra = new Economico(renavamCompra);
 		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
 		veiculoCompra = cifrador.criptografar(cifrador.getChaveAES(), veiculoCompra);
-		
+
 
 		String hashConta = assinarMsg(conta.toString());
 		String hashVeiculo = assinarMsg(veiculoCompra.toString());
-		
+
 		veiculoCompra = stubGateway.comprarVeiculo(this.nome, conta, veiculoCompra, hashConta, hashVeiculo);
 		if (veiculoCompra != null) {
 			veiculoCompra = cifrador.descriptografar(cifrador.getChaveAES(), veiculoCompra);
@@ -336,7 +336,7 @@ public class Usuario {
 	protected void listarVeiculos() throws RemoteException, Exception {
 		String msg = cifrador.criptografar("mensagem");
 		String hashMsg = assinarMsg(msg);
-		
+
 		List<Veiculo> veiculos = stubGateway.listarVeiculos(this.nome, msg, hashMsg);
 		if (veiculos != null) {
 			System.out.println("Veículos encontrados:");

@@ -1,5 +1,6 @@
 package Servidor;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 import BancoDeDados.VeiculoManager;
@@ -15,8 +16,8 @@ public class ImplServidorLoja implements ServidorLoja {
 			mensagemPrivada = "EstouAutentificado";
 	private Cifrador cifrador;
 
-	public ImplServidorLoja() throws Exception {
-		this.bd_veiculos = new VeiculoManager(chaveAESbd);
+	public ImplServidorLoja(String arquivo) throws Exception {
+		this.bd_veiculos = new VeiculoManager(chaveAESbd, arquivo);
 		cifrador = new Cifrador(chaveAES_GateLoja);
 	}
 
@@ -131,7 +132,7 @@ public class ImplServidorLoja implements ServidorLoja {
 
 	public Veiculo removerVeiculo(String mensagem, Veiculo veiculo) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
-		
+
 //		System.out.println("loja remoção crip: " + veiculo);
 		if (autentificar(mensagem)) {
 			veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
@@ -154,8 +155,8 @@ public class ImplServidorLoja implements ServidorLoja {
 			veiculo = cifrador.descriptografar(chaveAES_GateLoja, veiculo);
 			emailDono = cifrador.descriptografar(emailDono);
 			veiculo.setEmailDono(emailDono);
-			
-			
+
+
 			Veiculo veiculoNovoDono = bd_veiculos.atualizarVeiculo(veiculo.getRenavam(), veiculo);
 //			veiculoNovoDono = cifrador.descriptografar(chaveAES_GateLoja, veiculoNovoDono);
 
@@ -184,7 +185,7 @@ public class ImplServidorLoja implements ServidorLoja {
 	}
 
 	public static void main(String[] args) throws Exception {
-		ImplServidorLoja isl = new ImplServidorLoja();
+		ImplServidorLoja isl = new ImplServidorLoja("veiculos.ser");
 		Cifrador cifrador = new Cifrador("chaveAESgateloja");
 		String mensagem = cifrador.criptografar("EstouAutentificado");
 		String email = cifrador.criptografar("brennokm@gmail.com");
@@ -193,5 +194,10 @@ public class ImplServidorLoja implements ServidorLoja {
 		v = cifrador.criptografar(cifrador.getChaveAES(), v);
 		isl.atribuirDono(mensagem, v, email);
 		isl.buscarVeiculoPorModelo(mensagem, modelo);
+	}
+
+	@Override
+	public boolean testarConexao() throws RemoteException, Exception {
+		return true;
 	}
 }

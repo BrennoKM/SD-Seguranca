@@ -8,8 +8,8 @@ import Servidor.ImplServidorAutentificacao;
 import ServidorInterface.ServidorAutentificacao;
 
 public class IniciarServidorAutentificacao {
-	private static int porta = 1099;
-	
+	private int porta = 1099;
+
 	private void config(String host) {
 		System.setProperty("java.rmi.server.hostname", host);
 		System.setProperty("java.security.policy", "java.policy");
@@ -19,7 +19,7 @@ public class IniciarServidorAutentificacao {
 		 */
 
 	}
-	
+
 	public IniciarServidorAutentificacao(String hostAuth, int porta) {
 		this.porta = porta;
 		config(hostAuth);
@@ -31,6 +31,7 @@ public class IniciarServidorAutentificacao {
 					0);
 			LocateRegistry.createRegistry(this.porta + modificadorPorta);
 			Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
+			System.out.println("Registro: " + registro);
 			registro.bind("ServidorAutentificacao", skeleton);
 			System.out.println(
 					"Servidor de autentificação está no ar. host=" + hostAuth + " porta=" + (porta + modificadorPorta));
@@ -39,5 +40,5 @@ public class IniciarServidorAutentificacao {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

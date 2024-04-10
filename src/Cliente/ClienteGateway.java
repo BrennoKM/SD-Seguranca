@@ -45,6 +45,9 @@ public class ClienteGateway {
 			try {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
 				this.stubGateway = (ServidorGateway) registro.lookup("ServidorGateway");
+				if(this.stubGateway != null) {
+					System.out.println(this.stubGateway.toString());
+				}
 				tokenServidor = new TokenInfo();
 				cifrador = new Cifrador();
 				ChavesModulo chaveModuloServidor = this.stubGateway.receberChavePubModulo(this.nome);
@@ -144,16 +147,16 @@ public class ClienteGateway {
 
 				String hashAssinado;
 				switch (opcaoInt) {
-				case 1:
-					conta = construirMensagemLogin("login", in, cifrador);
-					hashAssinado = assinarMsg(conta.toString());
-					contaLogada = stubGateway.fazerLogin(this.nome, conta, hashAssinado);
-					break;
-				case 2:
-					conta = construirMensagemLogin("cadastro", in, cifrador);
-					hashAssinado = assinarMsg(conta.toString());
-					contaLogada = stubGateway.fazerCadastro(this.nome, conta, hashAssinado);
-					break;
+					case 1:
+						conta = construirMensagemLogin("login", in, cifrador);
+						hashAssinado = assinarMsg(conta.toString());
+						contaLogada = stubGateway.fazerLogin(this.nome, conta, hashAssinado);
+						break;
+					case 2:
+						conta = construirMensagemLogin("cadastro", in, cifrador);
+						hashAssinado = assinarMsg(conta.toString());
+						contaLogada = stubGateway.fazerCadastro(this.nome, conta, hashAssinado);
+						break;
 				}
 				if (contaLogada != null) {
 					contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaLogada);
@@ -166,7 +169,7 @@ public class ClienteGateway {
 			Thread.sleep(500);
 		}
 	}
-	
+
 	private String assinarMsg(String msg) throws Exception {
 		String hashAssinado;
 		String msgHash;

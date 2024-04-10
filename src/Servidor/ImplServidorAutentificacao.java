@@ -15,7 +15,7 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 		this.bd_contas = new ContaManager(chaveAESbd);
 		cifrador = new Cifrador(chaveAES_GateAuth);
 	}
-	
+
 	private boolean autentificar(String mensagem) {
 		if (mensagem.equals(mensagemPrivada)) {
 			return true;
@@ -57,12 +57,12 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 //				bd_contas.carregarLista();
 				return contaCadastrada;
 			}
-			
+
 		}
 		System.out.println("\t\t\tAutentificação -> Falha no cadastro!");
 		return null;
 	}
-	
+
 	public Conta buscarConta(String mensagem, String email) throws Exception {
 //		System.out.println("mensagem authrecebida: "+ mensagem);
 		mensagem = cifrador.descriptografar(mensagem);
@@ -78,12 +78,12 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 //				bd_contas.carregarLista();
 				return contaBusca;
 			}
-			
+
 		}
 		System.out.println("\t\t\tAutentificação -> Falha na busca!");
 		return null;
 	}
-	
+
 	public Conta atualizarConta(String mensagem, Conta conta) throws Exception {
 //		System.out.println("mensagem authrecebida: "+ mensagem);
 		mensagem = cifrador.descriptografar(mensagem);
@@ -98,7 +98,7 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 //				bd_contas.carregarLista();
 				return contaAtualizada;
 			}
-			
+
 		}
 		System.out.println("\t\t\tAutentificação -> Falha no cadastro!");
 		return null;
@@ -116,13 +116,13 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 		return null;
 	}
 
-	
+
 	public static void main(String[] args) throws Exception {
 		ImplServidorAutentificacao isa = new ImplServidorAutentificacao();
 		Cifrador cifrador = new Cifrador("chaveAESgateauth");
 		String mensagem = cifrador.criptografar("EstouAutentificado");
 		String email = cifrador.criptografar("brennokm@gmail.com");
-		
+
 		Conta conta = isa.buscarConta(mensagem, email);
 		System.out.println(conta);
 		conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);

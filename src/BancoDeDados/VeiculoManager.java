@@ -17,12 +17,13 @@ import Modelos.Categorias.Intermediario;
 public class VeiculoManager implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Map<String, Veiculo> mapaVeiculos;
-	private final String arquivo = "veiculos.ser";
-//	private String chaveAES = "chaveAESdobd4321";
+	private String arquivo = "veiculos.ser";
+	//	private String chaveAES = "chaveAESdobd4321";
 	private Cifrador cifrador;
 
-	public VeiculoManager(String chaveAES) throws Exception {
+	public VeiculoManager(String chaveAES, String arquivo) throws Exception {
 		mapaVeiculos = new HashMap<>();
+		this.arquivo = arquivo;
 		cifrador = new Cifrador(chaveAES);
 		carregarLista();
 
@@ -112,7 +113,7 @@ public class VeiculoManager implements Serializable {
 	@SuppressWarnings("unchecked")
 	public synchronized void carregarLista() throws Exception {
 		try (FileInputStream fileIn = new FileInputStream(arquivo);
-				ObjectInputStream in = new ObjectInputStream(fileIn)) {
+			 ObjectInputStream in = new ObjectInputStream(fileIn)) {
 			this.mapaVeiculos = (HashMap<String, Veiculo>) in.readObject();
 			// Descriptografar e atualizar os veículos no mapa
 			for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
@@ -130,7 +131,7 @@ public class VeiculoManager implements Serializable {
 
 	public synchronized void salvarLista() throws Exception {
 		try (FileOutputStream fileOut = new FileOutputStream(arquivo);
-				ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+			 ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 			for (Map.Entry<String, Veiculo> entry : mapaVeiculos.entrySet()) {
 				Veiculo veiculo = entry.getValue();
 //				System.out.println("Salvando: " + veiculo);
@@ -190,7 +191,7 @@ public class VeiculoManager implements Serializable {
 
 	public static void main(String[] args) throws Exception {
 		final String chaveAES = "chaveAESdobd4321";
-		VeiculoManager manager = new VeiculoManager(chaveAES);
+		VeiculoManager manager = new VeiculoManager(chaveAES, "veiculos.ser");
 
 		// Carregar lista do arquivo
 		// manager.carregarLista();

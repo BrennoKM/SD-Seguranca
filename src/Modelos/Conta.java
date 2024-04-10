@@ -13,7 +13,7 @@ public class Conta implements Serializable{
 		this.senha = senha;
 
 	}
-	
+
 	public Conta(String nome, String cpf, String endereco, String telefone, String email, String senha) {
 		this.nome = nome;
 		this.cpf = cpf;
@@ -23,7 +23,7 @@ public class Conta implements Serializable{
 		this.senha = senha;
 
 	}
-	
+
 	public Conta(String nome, String cpf, String endereco, String telefone, String email, String senha, String saldo, String tipoConta) {
 		this.nome = nome;
 		this.cpf = cpf;
@@ -38,13 +38,13 @@ public class Conta implements Serializable{
 
 	public Conta(Conta conta) {
 		this.nome = conta.getNome();
-	    this.cpf = conta.getCpf();
-	    this.endereco = conta.getEndereco();
-	    this.telefone = conta.getTelefone();
-	    this.email = conta.getEmail();
-	    this.senha = conta.getSenha();
-	    this.saldo = conta.getSaldo();
-	    this.tipoConta = conta.getTipoConta();
+		this.cpf = conta.getCpf();
+		this.endereco = conta.getEndereco();
+		this.telefone = conta.getTelefone();
+		this.email = conta.getEmail();
+		this.senha = conta.getSenha();
+		this.saldo = conta.getSaldo();
+		this.tipoConta = conta.getTipoConta();
 	}
 
 	public String getNome() {
@@ -102,7 +102,7 @@ public class Conta implements Serializable{
 	public void setSaldo(String saldo) {
 		this.saldo = saldo;
 	}
-	
+
 	public String getTipoConta() {
 		return this.tipoConta;
 	}
@@ -110,20 +110,20 @@ public class Conta implements Serializable{
 	public void setTipoConta(String tipoConta) {
 		this.tipoConta = tipoConta;
 	}
-	
+
 	public String toString() {
-        return "Conta[" +
-                "nome=" + this.nome +
-                ", cpf=" + this.cpf +
-                ", email=" + this.email +
-                ", senha=" + this.senha +
-                ", endereco=" + this.endereco +
-                ", telefone=" + this.telefone +
-                ", saldo=" + this.saldo +
-                ", tipoConta=" +this.tipoConta +
-                ']';
-    }
-	
+		return "Conta[" +
+				"nome=" + this.nome +
+				", cpf=" + this.cpf +
+				", email=" + this.email +
+				", senha=" + this.senha +
+				", endereco=" + this.endereco +
+				", telefone=" + this.telefone +
+				", saldo=" + this.saldo +
+				", tipoConta=" +this.tipoConta +
+				']';
+	}
+
 	public static void main(String[] args) {
 		String saldo = "0";
 		double suporte = Double.parseDouble(saldo);

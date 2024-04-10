@@ -25,15 +25,15 @@ public class ImplServidorGateway implements ServidorGateway {
 			mensagemPrivada = "EstouAutentificado";
 	private Cifrador cifrador;
 	private ServidorAutentificacao stubAuth;
-	private ServidorLoja stubLoja;
+	private ServidorLoja stubReplicas;
 	private Map<String, TokenInfo> tokenClientes = new HashMap<>();
 	private Map<String, TokenInfo> tokenClientesLogados = new HashMap<>();
 
-	public ImplServidorGateway(String hostAuth, String hostLoja, int porta) throws Exception {
+	public ImplServidorGateway(String hostAuth, String hostReplicas, int porta) throws Exception {
 		this.tokenClientes = new HashMap<>();
 		cifrador = new Cifrador();
 		abrirServidorAutentificacao(hostAuth, porta);
-		abrirServidorLoja(hostLoja, porta);
+		abrirReplicas(hostReplicas, porta);
 		// fazerLogin("brennokm@gmail.com", "qwe123");
 	}
 
@@ -45,7 +45,7 @@ public class ImplServidorGateway implements ServidorGateway {
 		 */
 	}
 
-	private void abrirServidorLoja(String host, int porta) throws Exception {
+	private void abrirReplicas(String host, int porta) throws Exception {
 		porta = porta + 2;
 		config();
 		Scanner entrada = new Scanner(System.in);
@@ -56,12 +56,12 @@ public class ImplServidorGateway implements ServidorGateway {
 		while (!conectou) {
 			try {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
-				this.stubLoja = (ServidorLoja) registro.lookup("ServidorLoja");
+				this.stubReplicas = (ImplReplicasControl) registro.lookup("ReplicasControl");
 				conectou = true;
 				entrada.close();
 			} catch (RemoteException | NotBoundException e) {
 				// e.printStackTrace();
-				System.err.println("Falha ao se conectar com o servidor de veiculos. Tentando novamente em 4 segundos");
+				System.err.println("Falha ao se conectar com o servidor de replicas. Tentando novamente em 4 segundos");
 				Thread.sleep(4000);
 			}
 		}
@@ -174,7 +174,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	private String requisicaoGateway(String nomeCliente, String chaveAEScliente, String mensagem, String tipo,
-			String chaveAESsaida) throws RemoteException, Exception {
+									 String chaveAESsaida) throws RemoteException, Exception {
 		System.out.println("\n\tGateway -> Requisição de " + tipo + " do cliente " + nomeCliente);
 		System.out.println("\t\t-> Mensagem recebida de " + nomeCliente + ": " + mensagem);
 		mensagem = cifrador.descriptografar(chaveAEScliente, mensagem);
@@ -297,7 +297,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "inserção");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			Veiculo veiculoAdicionado = stubLoja.adicionarVeiculo(msgPrivada, veiculo);
+			Veiculo veiculoAdicionado = stubReplicas.adicionarVeiculo(msgPrivada, veiculo);
 			if (veiculoAdicionado != null) {
 				System.out.println("\t\t-> Veiculo adicionado com sucesso!");
 				veiculoAdicionado = cifrador.descriptografar(chaveAES_GateLoja, veiculoAdicionado);
@@ -321,7 +321,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "remoção");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			Veiculo veiculoRemovido = stubLoja.removerVeiculo(msgPrivada, veiculo);
+			Veiculo veiculoRemovido = stubReplicas.removerVeiculo(msgPrivada, veiculo);
 			if (veiculoRemovido != null) {
 				System.out.println("\t\t-> Veiculo removido com sucesso!");
 				veiculoRemovido = cifrador.descriptografar(chaveAES_GateLoja, veiculoRemovido);
@@ -346,7 +346,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "atualização");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			Veiculo veiculoAtualizado = stubLoja.atualizarVeiculo(msgPrivada, veiculo);
+			Veiculo veiculoAtualizado = stubReplicas.atualizarVeiculo(msgPrivada, veiculo);
 			if (veiculoAtualizado != null) {
 				System.out.println("\t\t-> Veiculo atualizado com sucesso!");
 				veiculoAtualizado = cifrador.descriptografar(chaveAES_GateLoja, veiculoAtualizado);
@@ -370,7 +370,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			renavam = requisicaoGateway(nomeCliente, chaveAEScliente, renavam, "busca Renavam", chaveAES_GateLoja);
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			Veiculo veiculoBusca = stubLoja.buscarVeiculoPorRenavam(msgPrivada, renavam);
+			Veiculo veiculoBusca = stubReplicas.buscarVeiculoPorRenavam(msgPrivada, renavam);
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo encontrado!");
 				veiculoBusca = cifrador.descriptografar(chaveAES_GateLoja, veiculoBusca);
@@ -394,7 +394,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			modelo = requisicaoGateway(nomeCliente, chaveAEScliente, modelo, "busca modelo", chaveAES_GateLoja);
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			List<Veiculo> veiculoBusca = stubLoja.buscarVeiculoPorModelo(msgPrivada, modelo);
+			List<Veiculo> veiculoBusca = stubReplicas.buscarVeiculoPorModelo(msgPrivada, modelo);
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo(s) encontrado(s)!");
 				for (Veiculo veiculo : veiculoBusca) {
@@ -419,7 +419,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			}
 			requisicaoGateway(nomeCliente, chaveAEScliente, "listar veículos");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			List<Veiculo> veiculoBusca = stubLoja.getVeiculos(msgPrivada);
+			List<Veiculo> veiculoBusca = stubReplicas.getVeiculos(msgPrivada);
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo(s) encontrado(s)!");
 				for (Veiculo veiculo : veiculoBusca) {
@@ -458,10 +458,10 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			if (c != null) {
 				System.out.println("\t\tCategoria recebida: " + c.toString());
-				veiculoBusca = stubLoja.getVeiculos(msgPrivada, c);
+				veiculoBusca = stubReplicas.getVeiculos(msgPrivada, c);
 			} else {
 				System.out.println("\t\tCategoria recebida é invalida! Todas categorias serão exibidas.");
-				veiculoBusca = stubLoja.getVeiculos(msgPrivada);
+				veiculoBusca = stubReplicas.getVeiculos(msgPrivada);
 			}
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo(s) encontrado(s)!");
@@ -486,7 +486,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			}
 			requisicaoGateway(nomeCliente, chaveAEScliente, "quantidade veículos");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			String quantidade = stubLoja.getQntVeiculos(msgPrivada);
+			String quantidade = stubReplicas.getQntVeiculos(msgPrivada);
 			if (quantidade != null) {
 				System.out.println("\t\t-> Quantidade encontrada!");
 				quantidade = cifrador.descriptografar(chaveAES_GateLoja, quantidade);
@@ -499,7 +499,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public Veiculo comprarVeiculo(String nomeCliente, Conta conta, Veiculo veiculo, String hashConta,
-			String hashVeiculo) throws RemoteException, Exception {
+								  String hashVeiculo) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
 			String chaveAEScliente = tokenCliente.getChaveAES();
@@ -526,7 +526,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			// busca o veiculo no bando de dados
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "comprar veiculo");
-			veiculo = stubLoja.buscarVeiculoPorRenavam(msgPrivadaLoja, veiculo.getRenavam());
+			veiculo = stubReplicas.buscarVeiculoPorRenavam(msgPrivadaLoja, veiculo.getRenavam());
 			if (veiculo == null) {
 				System.out.println("\t\t-> Veículo não encontrada!");
 				return null;
@@ -547,7 +547,7 @@ public class ImplServidorGateway implements ServidorGateway {
 					contaDescontarSaldo.setSaldo(novoSaldo);
 
 					stubAuth.atualizarConta(msgPrivadaAuth, contaDescontarSaldo);
-					Veiculo veiculoComprado = stubLoja.atribuirDono(msgPrivadaLoja, veiculo, conta.getEmail());
+					Veiculo veiculoComprado = stubReplicas.atribuirDono(msgPrivadaLoja, veiculo, conta.getEmail());
 					if (veiculoComprado != null) {
 						System.out.println("\t\t-> Veículo comprado com sucesso!");
 						veiculoComprado = cifrador.descriptografar(chaveAES_GateLoja, veiculoComprado);
@@ -574,7 +574,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	// banco
 
 	public synchronized Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque, String hashConta,
-			String hashSaque) throws RemoteException, Exception {
+										 String hashSaque) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
 			String chaveAEScliente = tokenCliente.getChaveAES();
@@ -626,7 +626,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public synchronized Conta fazerDeposito(String nomeCliente, Conta conta, String valorDeposito, String hashConta,
-			String hashDeposito) throws RemoteException, Exception {
+											String hashDeposito) throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
 			String chaveAEScliente = tokenCliente.getChaveAES();
@@ -673,7 +673,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public synchronized Conta fazerTransferencia(String nomeCliente, Conta contaBeneficente, String valorTransferencia,
-			String emailFavorecido, String hashContaBene, String hashTransf, String hashEmailFavore)
+												 String emailFavorecido, String hashContaBene, String hashTransf, String hashEmailFavore)
 			throws RemoteException, Exception {
 		if (autentificarLogin(nomeCliente)) {
 			TokenInfo tokenCliente = tokenClientesLogados.get(nomeCliente);
