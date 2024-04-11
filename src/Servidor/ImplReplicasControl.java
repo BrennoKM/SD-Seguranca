@@ -6,6 +6,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -79,11 +80,24 @@ public class ImplReplicasControl implements ServidorLoja {
 			try {
 				if (stubLoja.testarConexao()) {
 					this.indiceLider = indice;
+//					System.out.println("novo lider " + indice);
 					return stubLoja;
 				}
+//				System.out.println("novo lider não encontrado, tentando novamente...");
+				return elegerLider();
 			} catch (Exception e) {
-				indices.remove(indice);
-				e.printStackTrace();
+//				System.out.println("exception eleição");
+				Iterator<Integer> iterator = indices.iterator();
+				while (iterator.hasNext()) {
+				    int i = iterator.next();
+				    if (i == indice) {
+				        iterator.remove();
+				        mapLojas.remove(i);
+				    }
+				}
+//				e.printStackTrace();
+				return elegerLider();
+				
 			}
 
 		}
@@ -92,28 +106,55 @@ public class ImplReplicasControl implements ServidorLoja {
 
 	private ServidorLoja testarLoja(int indice) {
 		try {
-			System.out.println("Testando " + indice);
+//			System.out.println("Testando " + indice);
 			ServidorLoja stubLoja = mapLojas.get(indice);
 			if (stubLoja != null && stubLoja.testarConexao()) {
+//				System.out.println("loja funciona " + indice);
 				return stubLoja;
 			}
-		} catch (Exception e) {
-			indices.remove(indice);
+//			System.out.println("não funcionou");
+			for(int i : indices) {
+				if(i == indice) {
+//					System.out.println("loja não funciona removendo " + indice);
+					indices.remove(i);
+					mapLojas.remove(i);
+				}
+			}
 			if (indice == this.indiceLider) {
 				this.indiceLider = -1;
+				elegerLider();
 			}
-			e.printStackTrace();
+//			System.out.println("indo testar nova loja " + indices.get(0));
+			return testarLoja(indices.get(0));
+		} catch (Exception e) {
+			Iterator<Integer> iterator = indices.iterator();
+			while (iterator.hasNext()) {
+			    int i = iterator.next();
+			    if (i == indice) {
+			        iterator.remove();
+			        mapLojas.remove(i);
+			    }
+			}
+			
+			if (indice == this.indiceLider) {
+				this.indiceLider = -1;
+				elegerLider();
+			}
+//			e.printStackTrace();
+			return testarLoja(indices.get(0));
+			
 		}
-		return null;
 	}
 
 	public ServidorLoja getStubRead() {
-		for (Integer i : indices) {
+		for (int i : indices) {
 			ServidorLoja stub = testarLoja(i);
-			if (stub != null) {
-				return stub;
+			if (stub == null) {
+				stub = getStubRead();
 			}
+			return stub;
 		}
+//		System.out.println("saindo getstubread");
 		return null;
 	}
 
@@ -123,7 +164,7 @@ public class ImplReplicasControl implements ServidorLoja {
 			stub = elegerLider();
 		}
 		if (stub != null) {
-			System.out.println("achou o lider");
+//			System.out.println("achou o lider" + this.indiceLider);
 			return stub;
 		}
 		return null;
@@ -138,7 +179,7 @@ public class ImplReplicasControl implements ServidorLoja {
 	}
 
 	public List<Veiculo> getVeiculos(String mensagem) throws Exception {
-		System.out.println("getveic");
+//		System.out.println("getveic");
 		return getStubRead().getVeiculos(mensagem);
 	}
 
@@ -151,21 +192,21 @@ public class ImplReplicasControl implements ServidorLoja {
 	}
 
 	public Veiculo adicionarVeiculo(String mensagem, Veiculo veiculo) throws Exception {
-		System.out.println("tentando adicionar");
+//		System.out.println("tentando adicionar");
 		if (this.escrevendo == true) {
 			do {
-				System.out.println("oii");
 			} while (this.escrevendo == true);
 		}
 		this.escrevendo = true;
-		System.out.println("chegou aqui");
+//		System.out.println("chegou aqui");
 		Veiculo v = getStubWrite().adicionarVeiculo(mensagem, veiculo);
-		System.out.println("pos add");
+//		System.out.println("pos add");
 		if (v != null) {
 			atualizarReplicas(mensagem, v);
 		}
+//		System.out.println("escrevendo falsew");
 		this.escrevendo = false;
-		System.out.println("escrevendo false");
+//		System.out.println("escrevendo false");
 		return v;
 	}
 
@@ -197,7 +238,6 @@ public class ImplReplicasControl implements ServidorLoja {
 		return v;
 	}
 
-
 	public Veiculo atribuirDono(String mensagem, Veiculo veiculo, String emailDono) throws Exception {
 		if (this.escrevendo == true) {
 			do {
@@ -214,28 +254,34 @@ public class ImplReplicasControl implements ServidorLoja {
 
 	public void atualizarReplicas(String mensagem, Veiculo veiculo) throws RemoteException, Exception {
 		ArrayList<Integer> replicas = new ArrayList<Integer>(this.indices);
-		System.out.println(replicas);
-		replicas.remove(indiceLider);
-		System.out.println(replicas);
+//		System.out.println(replicas);
+//		replicas.remove(indiceLider);
+//		System.out.println(replicas);
 		for (int i : replicas) {
-			ServidorLoja stub = mapLojas.get(i);
-			if(stub.atualizarVeiculo(mensagem, veiculo) == null){
-				stub.adicionarVeiculo(mensagem, veiculo);
+//			System.out.println("for att");
+			if (i != this.indiceLider) {
+				ServidorLoja stub = mapLojas.get(i);
+				if (stub.atualizarVeiculo(mensagem, veiculo) == null) {
+					stub.adicionarVeiculo(mensagem, veiculo);
+				}
 			}
 		}
 	}
 
 	private void atualizarReplicas(String mensagem, Veiculo veiculo, boolean b) throws RemoteException, Exception {
 		ArrayList<Integer> replicas = new ArrayList<Integer>(this.indices);
-		System.out.println(replicas);
-		replicas.remove(indiceLider);
-		System.out.println(replicas);
+//		System.out.println(replicas);
+//		replicas.remove(indiceLider);
+//		System.out.println(replicas);
 		for (int i : replicas) {
-			ServidorLoja stub = mapLojas.get(i);
-			stub.removerVeiculo(mensagem, veiculo);
+			if (i != this.indiceLider) {
+				ServidorLoja stub = mapLojas.get(i);
+//				System.out.println("removendo do indice " + i);
+				stub.removerVeiculo(mensagem, veiculo);
+			}
 		}
 	}
-	
+
 	public boolean testarConexao() throws RemoteException, Exception {
 		elegerLider();
 		return true;

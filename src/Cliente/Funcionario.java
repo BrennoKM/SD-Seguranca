@@ -75,6 +75,7 @@ public class Funcionario extends Usuario {
 				}
 			} catch (Exception e) {
 				System.err.println("A sessão foi perdida!! :(");
+//				e.printStackTrace();
 			}
 		}
 
