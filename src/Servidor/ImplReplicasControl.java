@@ -59,6 +59,8 @@ public class ImplReplicasControl implements ServidorLoja {
 				ServidorLoja stubLoja = (ServidorLoja) registro.lookup("ServidorLoja");
 				mapLojas.put(indice, stubLoja);
 				indices.add(indice);
+				System.out.println("Loja adicionada " + indice);
+				System.out.println(indices);
 				conectou = true;
 				entrada.close();
 			} catch (RemoteException | NotBoundException e) {
@@ -80,7 +82,7 @@ public class ImplReplicasControl implements ServidorLoja {
 				}
 			} catch (Exception e) {
 				indices.remove(indice);
-				System.err.println(e);
+				e.printStackTrace();
 			}
 
 		}
@@ -89,8 +91,9 @@ public class ImplReplicasControl implements ServidorLoja {
 
 	private ServidorLoja testarLoja(int indice) {
 		try {
+			System.out.println("Testando " + indice);
 			ServidorLoja stubLoja = mapLojas.get(indice);
-			if (stubLoja.testarConexao()) {
+			if (stubLoja != null && stubLoja.testarConexao()) {
 				return stubLoja;
 			}
 		} catch (Exception e) {
@@ -98,7 +101,7 @@ public class ImplReplicasControl implements ServidorLoja {
 			if (indice == this.indiceLider) {
 				this.indiceLider = -1;
 			}
-			System.err.println(e);
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -119,6 +122,7 @@ public class ImplReplicasControl implements ServidorLoja {
 			stub = elegerLider();
 		}
 		if (stub != null) {
+			System.out.println("achou o lider");
 			return stub;
 		}
 		return null;
@@ -133,6 +137,7 @@ public class ImplReplicasControl implements ServidorLoja {
 	}
 
 	public List<Veiculo> getVeiculos(String mensagem) throws Exception {
+		System.out.println("getveic");
 		return getStubRead().getVeiculos(mensagem);
 	}
 
@@ -185,11 +190,12 @@ public class ImplReplicasControl implements ServidorLoja {
 		this.escrevendo = true;
 		Veiculo v = getStubWrite().removerVeiculo(mensagem, veiculo);
 		if (v != null) {
-			atualizarReplicas(mensagem, v);
+			atualizarReplicas(mensagem, v, true);
 		}
 		this.escrevendo = false;
 		return v;
 	}
+
 
 	public Veiculo atribuirDono(String mensagem, Veiculo veiculo, String emailDono) throws Exception {
 		if (this.escrevendo == true) {
@@ -207,14 +213,30 @@ public class ImplReplicasControl implements ServidorLoja {
 
 	public void atualizarReplicas(String mensagem, Veiculo veiculo) throws RemoteException, Exception {
 		ArrayList<Integer> replicas = new ArrayList<Integer>(this.indices);
+		System.out.println(replicas);
 		replicas.remove(indiceLider);
+		System.out.println(replicas);
 		for (int i : replicas) {
 			ServidorLoja stub = mapLojas.get(i);
-			stub.atualizarVeiculo(mensagem, veiculo);
+			if(stub.atualizarVeiculo(mensagem, veiculo) == null){
+				stub.adicionarVeiculo(mensagem, veiculo);
+			}
 		}
 	}
 
+	private void atualizarReplicas(String mensagem, Veiculo veiculo, boolean b) throws RemoteException, Exception {
+		ArrayList<Integer> replicas = new ArrayList<Integer>(this.indices);
+		System.out.println(replicas);
+		replicas.remove(indiceLider);
+		System.out.println(replicas);
+		for (int i : replicas) {
+			ServidorLoja stub = mapLojas.get(i);
+			stub.removerVeiculo(mensagem, veiculo);
+		}
+	}
+	
 	public boolean testarConexao() throws RemoteException, Exception {
+		elegerLider();
 		return true;
 	}
 

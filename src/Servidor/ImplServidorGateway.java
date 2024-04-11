@@ -57,6 +57,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			try {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
 				this.stubReplicas = (ServidorLoja) registro.lookup("ReplicasControl");
+				this.stubReplicas.testarConexao();
 				conectou = true;
 				entrada.close();
 			} catch (RemoteException | NotBoundException e) {

@@ -20,8 +20,8 @@ public class Usuario {
 	protected TokenInfo tokenServidor;
 	protected Scanner in = new Scanner(System.in);
 
-	public Usuario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem, TokenInfo tokenServidor)
-			throws RemoteException, Exception {
+	public Usuario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem,
+			TokenInfo tokenServidor) throws RemoteException, Exception {
 		System.out.println(mensagem);
 		this.nome = nome;
 		this.stubGateway = stubGateway;
@@ -80,11 +80,12 @@ public class Usuario {
 	public boolean iniciar() throws RemoteException, Exception {
 		int opcao = 0;
 		while (opcao != 8) {
-			System.out.println("Escolha uma opção: \n\t1 - Listar veículos \n\t2 - Listar veículos por categoria"
-					+ "\n\t3 - Pesquisar veículo por renavam \n\t4 - Pesquisar veíuclo por modelo \n\t5 - Exibir quantidade total de veículos"
-					+ "\n\t6 - Comprar veículo \n\t7 - Ver dados da minha conta \n\t8 - Sair \n\t0 - Acessar conta bancária");
-			opcao = obterInt(0, 8);
-			switch (opcao) {
+			try {
+				System.out.println("Escolha uma opção: \n\t1 - Listar veículos \n\t2 - Listar veículos por categoria"
+						+ "\n\t3 - Pesquisar veículo por renavam \n\t4 - Pesquisar veíuclo por modelo \n\t5 - Exibir quantidade total de veículos"
+						+ "\n\t6 - Comprar veículo \n\t7 - Ver dados da minha conta \n\t8 - Sair \n\t0 - Acessar conta bancária");
+				opcao = obterInt(0, 8);
+				switch (opcao) {
 				case 0:
 					acessarBanco();
 				case 1:
@@ -112,6 +113,9 @@ public class Usuario {
 					System.out.println("Deslogando...");
 					break;
 
+				}
+			} catch (Exception e) {
+				System.err.println("A sessão foi perdida!! :(");
 			}
 		}
 		return false;
@@ -125,24 +129,24 @@ public class Usuario {
 							+ "\n\t4 - Visualizar minha conta \n\t5 - Simular investimentos \n\t6 - Sair do banco");
 			int opcaoBanco = obterInt(1, 6);
 			switch (opcaoBanco) {
-				case 1:
-					fazerSaque();
-					break;
-				case 2:
-					fazerDeposito();
-					break;
-				case 3:
-					fazerTransferencia();
-					break;
-				case 4:
-					verMinhaconta();
-					break;
-				case 5:
-					simularInvestimentos();
-					break;
-				case 6:
-					usandoBanco = false;
-					break;
+			case 1:
+				fazerSaque();
+				break;
+			case 2:
+				fazerDeposito();
+				break;
+			case 3:
+				fazerTransferencia();
+				break;
+			case 4:
+				verMinhaconta();
+				break;
+			case 5:
+				simularInvestimentos();
+				break;
+			case 6:
+				usandoBanco = false;
+				break;
 			}
 		}
 
@@ -197,7 +201,8 @@ public class Usuario {
 		String hashTransfe = assinarMsg(valorTransferencia);
 		String hashEmailFavore = assinarMsg(emailFavorecido);
 
-		contaBeneficente = stubGateway.fazerTransferencia(nome, contaBeneficente, valorTransferencia, emailFavorecido, hashBene, hashTransfe, hashEmailFavore);
+		contaBeneficente = stubGateway.fazerTransferencia(nome, contaBeneficente, valorTransferencia, emailFavorecido,
+				hashBene, hashTransfe, hashEmailFavore);
 		if (contaBeneficente != null) {
 			contaLogada = cifrador.descriptografar(cifrador.getChaveAES(), contaBeneficente);
 			System.out.println("Transferência feita, novo saldo é: " + contaLogada.getSaldo());
@@ -250,8 +255,8 @@ public class Usuario {
 		String msg = cifrador.criptografar("mensagem");
 		String hashMsg = assinarMsg(msg);
 
-		System.out.println(
-				"Quantidade total de veículos: " + cifrador.descriptografar(stubGateway.getQntVeiculo(this.nome, msg, hashMsg)));
+		System.out.println("Quantidade total de veículos: "
+				+ cifrador.descriptografar(stubGateway.getQntVeiculo(this.nome, msg, hashMsg)));
 	}
 
 	protected void comprarVeiculo() throws RemoteException, Exception {
@@ -260,7 +265,6 @@ public class Usuario {
 		Veiculo veiculoCompra = new Economico(renavamCompra);
 		Conta conta = cifrador.criptografar(cifrador.getChaveAES(), new Conta(contaLogada));
 		veiculoCompra = cifrador.criptografar(cifrador.getChaveAES(), veiculoCompra);
-
 
 		String hashConta = assinarMsg(conta.toString());
 		String hashVeiculo = assinarMsg(veiculoCompra.toString());
