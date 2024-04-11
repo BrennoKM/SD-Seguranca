@@ -40,7 +40,7 @@ public class IniciarServidorGateway {
 			LocateRegistry.createRegistry(porta + modificadorPorta);
 			Registry registro = LocateRegistry.getRegistry(porta + modificadorPorta);
 			System.out.println("Registro: " + registro);
-			registro.bind("ServidorGateway", skeleton);
+			registro.rebind("rmi://" + hostGate + "/ServidorGateway", skeleton);
 			System.out.println("Servidor de gateway está no ar. host=" + hostGate + " porta=" + (porta + modificadorPorta));
 		} catch (Exception e) {
 			System.err.println("Servidor: " + e.getMessage());

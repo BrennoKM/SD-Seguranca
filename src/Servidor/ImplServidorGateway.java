@@ -37,7 +37,8 @@ public class ImplServidorGateway implements ServidorGateway {
 		// fazerLogin("brennokm@gmail.com", "qwe123");
 	}
 
-	private static void config() {
+	private static void config(String host) {
+		System.setProperty("java.rmi.server.hostname", host);
 		System.setProperty("java.security.policy", "java.policy");
 		/*
 		 * if (System.getSecurityManager() == null) { System.setSecurityManager(new
@@ -47,7 +48,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	private void abrirReplicas(String host, int porta) throws Exception {
 		porta = porta + 2;
-		config();
+		config(host);
 		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de autentificação: ");
 		// String host = entrada.nextLine();
@@ -56,7 +57,7 @@ public class ImplServidorGateway implements ServidorGateway {
 		while (!conectou) {
 			try {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
-				this.stubReplicas = (ServidorLoja) registro.lookup("ReplicasControl");
+				this.stubReplicas = (ServidorLoja) registro.lookup("rmi://" + host + "/ReplicasControl");
 				this.stubReplicas.testarConexao();
 				conectou = true;
 				entrada.close();
@@ -70,7 +71,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	private void abrirServidorAutentificacao(String host, int porta) throws Exception {
 		porta = porta + 1;
-		config();
+		config(host);
 		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de loja: ");
 		// String host = entrada.nextLine();
@@ -79,7 +80,7 @@ public class ImplServidorGateway implements ServidorGateway {
 		while (!conectou) {
 			try {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
-				this.stubAuth = (ServidorAutentificacao) registro.lookup("ServidorAutentificacao");
+				this.stubAuth = (ServidorAutentificacao) registro.lookup("rmi://" + host + "/ServidorAutentificacao");
 				conectou = true;
 				entrada.close();
 			} catch (RemoteException | NotBoundException e) {

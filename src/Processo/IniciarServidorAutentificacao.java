@@ -32,7 +32,7 @@ public class IniciarServidorAutentificacao {
 			LocateRegistry.createRegistry(this.porta + modificadorPorta);
 			Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
 			System.out.println("Registro: " + registro);
-			registro.bind("ServidorAutentificacao", skeleton);
+			registro.rebind("rmi://" + hostAuth + "/ServidorAutentificacao", skeleton);
 			System.out.println(
 					"Servidor de autentificação está no ar. host=" + hostAuth + " porta=" + (porta + modificadorPorta));
 		} catch (Exception e) {

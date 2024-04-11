@@ -31,7 +31,7 @@ public class IniciarReplicasControl {
             LocateRegistry.createRegistry(this.porta + modificadorPorta);
             Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
             System.out.println("Registro: " + registro);
-            registro.bind("ReplicasControl", skeleton);
+            registro.rebind("rmi://" + hostReplicas + "/ReplicasControl", skeleton);
             System.out
                     .println("Servidor de Replicas está no ar. host=" + hostReplicas + " porta=" + (porta + modificadorPorta));
         } catch (Exception e) {

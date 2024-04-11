@@ -26,7 +26,8 @@ public class ClienteGateway {
 		abrirServidorGateway(host, porta);
 	}
 
-	private void config() {
+	private void config(String host) {
+		System.setProperty("java.rmi.server.hostname", host);
 		System.setProperty("java.security.policy", "java.policy");
 		/*
 		 * if (System.getSecurityManager() == null) { System.setSecurityManager(new
@@ -35,7 +36,7 @@ public class ClienteGateway {
 	}
 
 	private void abrirServidorGateway(String host, int porta) throws Exception {
-		config();
+		config(host);
 //		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de gateway: ");
 		// String host = entrada.nextLine();
@@ -44,8 +45,9 @@ public class ClienteGateway {
 		boolean conectou = false;
 		while (!conectou) {
 			try {
+				System.out.println(host + " " + porta);
 				Registry registro = LocateRegistry.getRegistry(host, porta);
-				this.stubGateway = (ServidorGateway) registro.lookup("ServidorGateway");
+				this.stubGateway = (ServidorGateway) registro.lookup("rmi://" + host + "/ServidorGateway");
 				if(this.stubGateway != null) {
 					System.out.println(this.stubGateway.toString());
 				}

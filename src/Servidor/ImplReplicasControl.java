@@ -36,7 +36,8 @@ public class ImplReplicasControl implements ServidorLoja {
 
 	}
 
-	private static void config() {
+	private static void config(String host) {
+		System.setProperty("java.rmi.server.hostname", host);
 		System.setProperty("java.security.policy", "java.policy");
 		/*
 		 * if (System.getSecurityManager() == null) { System.setSecurityManager(new
@@ -46,7 +47,7 @@ public class ImplReplicasControl implements ServidorLoja {
 
 	private void abrirServidorLoja(int indice, String host, int porta) throws Exception {
 //		porta = porta + 2;
-		config();
+		config(host);
 		Scanner entrada = new Scanner(System.in);
 		// System.out.println("Informe o endereço do serviço de autentificação: ");
 		// String host = entrada.nextLine();
@@ -56,7 +57,7 @@ public class ImplReplicasControl implements ServidorLoja {
 			try {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
 
-				ServidorLoja stubLoja = (ServidorLoja) registro.lookup("ServidorLoja");
+				ServidorLoja stubLoja = (ServidorLoja) registro.lookup("rmi://" + host + "/ServidorLoja");
 				mapLojas.put(indice, stubLoja);
 				indices.add(indice);
 				System.out.println("Loja adicionada " + indice);

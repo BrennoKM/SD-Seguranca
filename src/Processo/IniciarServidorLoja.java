@@ -32,7 +32,7 @@ public class IniciarServidorLoja {
 			LocateRegistry.createRegistry(this.porta + modificadorPorta);
 			Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
 			System.out.println("Registro: " + registro);
-			registro.bind("ServidorLoja", skeleton);
+			registro.rebind("rmi://" + hostLoja + "/ServidorLoja", skeleton);
 			System.out
 					.println("Servidor de veiculos está no ar. host=" + hostLoja + " porta=" + (porta + modificadorPorta));
 		} catch (Exception e) {
