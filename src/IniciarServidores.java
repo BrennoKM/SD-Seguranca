@@ -18,9 +18,9 @@ public class IniciarServidores{
 
 		// só pode ser iniciado uma vez
 		// iniciar servidorGateway, servidorAutentificacao e servidorLoja respectivamente
-//		new IniciarServidorLoja(hostLoja, portaInicial+0, "veiculos.ser");
-//		new IniciarServidorLoja(hostLoja, portaInicial+1, "veiculos1.ser");
-//		new IniciarServidorLoja(hostLoja, portaInicial+2, "veiculos2.ser");
+		new IniciarServidorLoja(hostLoja, portaInicial+0, "veiculos.ser");
+		new IniciarServidorLoja(hostLoja, portaInicial+1, "veiculos1.ser");
+		new IniciarServidorLoja(hostLoja, portaInicial+2, "veiculos2.ser");
 
 		new IniciarServidorAutentificacao(hostAuth, portaInicial);
 		new IniciarReplicasControl(hostReplicas, hostsLojas, portasLojas, portaInicial);
