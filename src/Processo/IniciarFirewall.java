@@ -3,22 +3,21 @@ package Processo;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import Servidor.ImplServidorGateway;
+
+import Servidor.ImplFirewall;
 import ServidorInterface.ServidorGateway;
 
-public class IniciarServidorGateway {
+public class IniciarFirewall {
 	private int porta = 1099;
 
-	public IniciarServidorGateway(String hostFirewall,String hostGateway, String hostAuth, String hostLoja, int porta) {
+	public IniciarFirewall(String hostFirewall, String hostGateway, int porta) {
 		this.porta = porta;
-		
+
 //		iniciarServidorAutentificacao(hostAuth);
 //		iniciarServidorLoja(hostLoja);
-		iniciarServidorGateway(hostFirewall, hostGateway, hostAuth, hostLoja, this.porta);
+		iniciarServidorFirewall(hostFirewall, hostGateway, this.porta);
 	}
 
-	
-	
 	public void config(String host) {
 		System.setProperty("java.rmi.server.hostname", host);
 		System.setProperty("java.security.policy", "java.policy");
@@ -29,28 +28,22 @@ public class IniciarServidorGateway {
 
 	}
 
-
-
-	private void iniciarServidorGateway(String hostFirewall, String hostGate, String hostAuth, String hostReplicas, int porta) {
-		config(hostGate);
-		int modificadorPorta = 0;
+	private void iniciarServidorFirewall(String hostFirewall, String hostGateway, int porta) {
+		config(hostFirewall);
+		int modificadorPorta = -1;
 		try {
 			// criar objeto servidor
-			ImplServidorGateway refObjetoRemoto = new ImplServidorGateway(hostGate, hostFirewall, hostAuth, hostReplicas, porta);
+			ImplFirewall refObjetoRemoto = new ImplFirewall(hostGateway, porta);
 			ServidorGateway skeleton = (ServidorGateway) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
 			LocateRegistry.createRegistry(porta + modificadorPorta);
 			Registry registro = LocateRegistry.getRegistry(porta + modificadorPorta);
 			System.out.println("Registro: " + registro);
 //			registro.rebind("ServidorGateway", skeleton);
-			registro.rebind("rmi://" + hostGate + "/ServidorGateway", skeleton);
-			System.out.println("Servidor de gateway está no ar. host=" + hostGate + " porta=" + (porta + modificadorPorta));
+			registro.rebind("rmi://" + hostFirewall + "/ServidorFirewall", skeleton);
+			System.out.println("Servidor de Firewall está no ar. host=" + hostFirewall + " porta=" + (porta + modificadorPorta));
 		} catch (Exception e) {
 			System.err.println("Servidor: " + e.getMessage());
 			e.printStackTrace();
 		}
-	}
-
-	public static void main(String[] args) {
-		new IniciarServidorGateway("localhost","localhost", "localhost", "localhost", 1099);
 	}
 }

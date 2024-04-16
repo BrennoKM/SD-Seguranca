@@ -10,4 +10,6 @@ public interface ServidorAutentificacao extends Remote {
 	Conta buscarConta(String mensagem, String email) throws RemoteException, Exception;
 	Conta removerConta(String mensagem,Conta conta) throws RemoteException, Exception;
 	Conta atualizarConta(String mensagem, Conta conta) throws RemoteException, Exception;
+	
+	String xerarDados() throws RemoteException, Exception;
 }

@@ -9,6 +9,7 @@ import Modelos.Conta;
 import Modelos.Veiculo;
 
 public interface ServidorGateway extends Remote{
+	boolean testarConexao() throws RemoteException, Exception;
 	//auth
 	Conta fazerLogin(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception;
 	Conta fazerCadastro(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception;

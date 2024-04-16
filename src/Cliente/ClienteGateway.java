@@ -14,8 +14,9 @@ import Modelos.TokenInfo;
 import ServidorInterface.ServidorGateway;
 
 public class ClienteGateway {
-	private String nome;
-	private ServidorGateway stubGateway;
+	private boolean invadindo = false;
+	private String nome, nomeServer = "/ServidorFirewall";
+	private ServidorGateway stubFirewall;
 	private Cifrador cifrador;
 	private TokenInfo tokenServidor;
 	private Conta contaLogada = null;
@@ -47,13 +48,13 @@ public class ClienteGateway {
 			try {
 				System.out.println(host + " " + porta);
 				Registry registro = LocateRegistry.getRegistry(host, porta);
-				this.stubGateway = (ServidorGateway) registro.lookup("rmi://" + host + "/ServidorGateway");
-				if(this.stubGateway != null) {
-					System.out.println(this.stubGateway.toString());
+				this.stubFirewall = (ServidorGateway) registro.lookup("rmi://" + host + nomeServer);
+				if(this.stubFirewall != null) {
+					System.out.println(this.stubFirewall.toString());
 				}
 				tokenServidor = new TokenInfo();
 				cifrador = new Cifrador();
-				ChavesModulo chaveModuloServidor = this.stubGateway.receberChavePubModulo(this.nome);
+				ChavesModulo chaveModuloServidor = this.stubFirewall.receberChavePubModulo(this.nome);
 
 				System.out.println("Chaves do Servidor: ");
 				System.out.println(chaveModuloServidor);
@@ -84,10 +85,10 @@ public class ClienteGateway {
 				System.out.println("\nMinha chaveAES criptografada: " + chaveAES);
 				System.out.println("Minha chaveHmac criptografada: " + chaveHmac);
 
-				this.stubGateway.enviarChaveAES(this.nome, chaveAES);
-				this.stubGateway.enviarChaveHmac(this.nome, chaveHmac);
+				this.stubFirewall.enviarChaveAES(this.nome, chaveAES);
+				this.stubFirewall.enviarChaveHmac(this.nome, chaveHmac);
 				chaveModulo.setChavePri(null);
-				this.stubGateway.enviarChavePubModulo(this.nome, chaveModulo);
+				this.stubFirewall.enviarChavePubModulo(this.nome, chaveModulo);
 				chaveModulo.setChavePri(chavePri);
 
 				System.out.println();
@@ -96,7 +97,7 @@ public class ClienteGateway {
 //				entrada.close();
 			} catch (RemoteException | NotBoundException e) {
 				e.printStackTrace();
-				System.err.println("Falha ao se conectar com o servidor de gateway. Tentando novamente em 4 segundos");
+				System.err.println("Falha ao se conectar com o servidor de firewall. Tentando novamente em 4 segundos");
 				Thread.sleep(4000);
 			}
 		}
@@ -115,13 +116,13 @@ public class ClienteGateway {
 	}
 
 	private boolean usuarioLogado() throws RemoteException, Exception {
-		return new Usuario(nome, stubGateway, cifrador, contaLogada, "Você logou como um usuário comum", tokenServidor)
+		return new Usuario(nome, stubFirewall, cifrador, contaLogada, "Você logou como um usuário comum", tokenServidor)
 				.iniciar();
 
 	}
 
 	private boolean funcionarioLogado() throws RemoteException, Exception {
-		return new Funcionario(nome, stubGateway, cifrador, contaLogada, "Você logou como funcionário", tokenServidor)
+		return new Funcionario(nome, stubFirewall, cifrador, contaLogada, "Você logou como funcionário", tokenServidor)
 				.iniciar();
 
 	}
@@ -153,12 +154,21 @@ public class ClienteGateway {
 					case 1:
 						conta = construirMensagemLogin("login", in, cifrador);
 						hashAssinado = assinarMsg(conta.toString());
-						contaLogada = stubGateway.fazerLogin(this.nome, conta, hashAssinado);
+						if(this.invadindo) {
+							this.invadindo = false;
+							contaLogada = stubFirewall.fazerLogin(this.nome, conta, hashAssinado);
+							String[] dados = contaLogada.getEmail().split(";");
+							System.out.println("Dados roubados: " + dados[2]);
+							nomeServer = "/ServidorGateway";
+							abrirServidorGateway(dados[0], Integer.parseInt(dados[1]));
+							
+						}
+						contaLogada = stubFirewall.fazerLogin(this.nome, conta, hashAssinado);
 						break;
 					case 2:
 						conta = construirMensagemLogin("cadastro", in, cifrador);
 						hashAssinado = assinarMsg(conta.toString());
-						contaLogada = stubGateway.fazerCadastro(this.nome, conta, hashAssinado);
+						contaLogada = stubFirewall.fazerCadastro(this.nome, conta, hashAssinado);
 						break;
 				}
 				if (contaLogada != null) {
@@ -191,6 +201,9 @@ public class ClienteGateway {
 		if (tipo.equals("login")) {
 			System.out.println("Digite o seu email: ");
 			email = in.nextLine();
+			if(email.contains(";")) {
+				this.invadindo = true;
+			}
 			System.out.println("Digite a sua senha: ");
 			senha = in.nextLine();
 			conta = new Conta(email, senha);

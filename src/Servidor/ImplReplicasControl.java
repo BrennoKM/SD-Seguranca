@@ -61,8 +61,8 @@ public class ImplReplicasControl implements ServidorLoja {
 				ServidorLoja stubLoja = (ServidorLoja) registro.lookup("rmi://" + host + "/ServidorLoja");
 				mapLojas.put(indice, stubLoja);
 				indices.add(indice);
-				System.out.println("Loja adicionada " + indice);
-				System.out.println(indices);
+//				System.out.println("Loja adicionada " + indice);
+//				System.out.println(indices);
 				conectou = true;
 				entrada.close();
 			} catch (RemoteException | NotBoundException e) {

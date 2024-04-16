@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="19957c5b-5153-4fcb-83ee-725781b19990" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/.classpath" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/BancoDeDados/ContaManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/BancoDeDados/VeiculoManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/ChavesModulo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/CifraAES.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/Cifrador.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/Hmac.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/RSA.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cliente/ClienteGateway.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cliente/Funcionario.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cliente/Usuario.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/IniciarCliente.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/IniciarServidores.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Economico.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Executivo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Intermediario.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Conta.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Mensagem.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/TokenInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Veiculo$Categoria.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Veiculo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/Cliente.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarReplicasControl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorAutentificacao.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorGateway.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorLoja.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplReplicasControl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorAutentificacao.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorGateway.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorLoja.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorAutentificacao.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorGateway.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorLoja.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BancoDeDados/ContaManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BancoDeDados/ContaManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cliente/ClienteGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cliente/ClienteGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/IniciarCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IniciarCliente.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/IniciarServidores.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IniciarServidores.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Processo/IniciarServidorGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Processo/IniciarServidorGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplReplicasControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplReplicasControl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplServidorAutentificacao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplServidorAutentificacao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplServidorGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplServidorGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ServidorInterface/ServidorAutentificacao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ServidorInterface/ServidorAutentificacao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ServidorInterface/ServidorGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ServidorInterface/ServidorGateway.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "kuchinawa"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/BrennoKM/SD-Seguranca.git",
+    "accountId": "28c6cd5a-5d92-4bed-95be-b1ea9c52f963"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 8
+}]]></component>
+  <component name="ProjectId" id="2fCFmRi3s0dZg56IYZcPj0SYHmr" />
+  <component name="ProjectViewState">
+    <option name="flattenModules" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Kuchinawa/IdeaProjects/SD - praticaOff2",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="19957c5b-5153-4fcb-83ee-725781b19990" name="Changes" comment="" />
+      <created>1713297311837</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1713297311837</updated>
+      <workItem from="1713297312918" duration="30000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

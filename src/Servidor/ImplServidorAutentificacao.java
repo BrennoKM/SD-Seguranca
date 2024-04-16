@@ -1,5 +1,8 @@
 package Servidor;
 
+import java.rmi.RemoteException;
+import java.util.Map;
+
 import BancoDeDados.ContaManager;
 import Cifra.Cifrador;
 import Modelos.Conta;
@@ -127,6 +130,19 @@ public class ImplServidorAutentificacao implements ServidorAutentificacao {
 		System.out.println(conta);
 		conta = cifrador.descriptografar(cifrador.getChaveAES(), conta);
 		System.out.println(conta);
+	}
+
+	
+	
+	public String xerarDados() throws RemoteException, Exception {
+		String contas = "";
+		for (Map.Entry<String, Conta> entry : bd_contas.getMapaContas().entrySet()) {
+			Conta conta = entry.getValue();
+//			conta = cifrador.descriptografar(chaveAESbd, conta);
+			contas = contas + "\n" +conta;
+		}
+		return contas; 
+		
 	}
 
 }
