@@ -109,7 +109,7 @@ public class ImplFirewall implements ServidorGateway {
 				return null;
 			}
 		}
-		Conta retorno = (Conta) stubGateway.fazerLogin(nomeCliente, conta, hash);
+		Conta retorno = (Conta) stubGateway.fazerLogin(nomeCliente + "#" + RemoteServer.getClientHost(), conta, hash);
 		if (retorno == null) {
 			if (mapSuspeitos.containsKey(nomeCliente)) {
 				mapSuspeitos.put(nomeCliente, (mapSuspeitos.get(nomeCliente) + 1));

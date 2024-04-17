@@ -87,7 +87,7 @@ public class Usuario {
 		while (opcao != 8) {
 			try {
 				System.out.println("Escolha uma opção: \n\t1 - Listar veículos \n\t2 - Listar veículos por categoria"
-						+ "\n\t3 - Pesquisar veículo por renavam \n\t4 - Pesquisar veíuclo por modelo \n\t5 - Exibir quantidade total de veículos"
+						+ "\n\t3 - Pesquisar veículo por renavam \n\t4 - Pesquisar veículo por modelo \n\t5 - Exibir quantidade total de veículos"
 						+ "\n\t6 - Comprar veículo \n\t7 - Ver dados da minha conta \n\t8 - Sair \n\t0 - Acessar conta bancária");
 				opcao = obterInt(0, 8);
 				switch (opcao) {
