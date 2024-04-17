@@ -10,6 +10,7 @@ import Modelos.Conta;
 import Modelos.TokenInfo;
 import Modelos.Veiculo;
 import Modelos.Categorias.Economico;
+import Processo.Cliente;
 import ServidorInterface.ServidorGateway;
 
 public class Usuario {
@@ -19,15 +20,19 @@ public class Usuario {
 	protected Conta contaLogada = null;
 	protected TokenInfo tokenServidor;
 	protected Scanner in = new Scanner(System.in);
+	protected String host;
+	protected int porta;
 
 	public Usuario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem,
-			TokenInfo tokenServidor) throws RemoteException, Exception {
+			TokenInfo tokenServidor, String host, int porta) throws RemoteException, Exception {
 		System.out.println(mensagem);
 		this.nome = nome;
 		this.stubGateway = stubGateway;
 		this.cifrador = cifrador;
 		this.contaLogada = contaLogada;
 		this.tokenServidor = tokenServidor;
+		this.host = host;
+		this.porta = porta;
 	}
 
 	protected String assinarMsg(String msg) throws Exception {
@@ -111,6 +116,7 @@ public class Usuario {
 					break;
 				case 8:
 					System.out.println("Deslogando...");
+					new Cliente(this.nome, this.host, this.porta);
 					break;
 
 				}

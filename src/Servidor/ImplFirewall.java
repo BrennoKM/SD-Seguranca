@@ -139,7 +139,7 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		ChavesModulo cm = stubGateway.receberChavePubModulo(nomeCliente);
+		ChavesModulo cm = stubGateway.receberChavePubModulo(nomeCliente + "#" + RemoteServer.getClientHost());
 		if(cm.getChavePub().equals("podebanir") && cm.getModulo() == null) {
 			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
 			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));

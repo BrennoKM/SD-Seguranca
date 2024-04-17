@@ -119,7 +119,7 @@ public class ImplServidorGateway implements ServidorGateway {
 		return false;
 	}
 	
-	private boolean autentificarPermissao(String ip) {
+	private boolean autentificarPermissao(String ip, boolean autoban) {
 		for (Permissao p : permissoes) {
 			if (p.getIp().equals(ip)) {
 				if (p.getPermicao()) {
@@ -130,15 +130,25 @@ public class ImplServidorGateway implements ServidorGateway {
 				}
 			}
 		}
-		System.out.println("\n\tGateway -> Adicionando na lista negra: " + ip);
-		permissoes.add(new Permissao(ip, porta, false));
-		return false;
+		if(autoban) {
+			System.out.println("\n\tGateway -> Adicionando na lista negra: " + ip);
+			permissoes.add(new Permissao(ip, porta, false));
+			return false;
+		}
+		return true;
 	}
 
 	// cliente recebe
 	public ChavesModulo receberChavePubModulo(String nomeCliente) throws ServerNotActiveException {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
-			return new ChavesModulo("Você está banido", null);
+		if(nomeCliente.contains("#")) {
+			String[] split = nomeCliente.split("#");
+			nomeCliente = split[0];
+			if (!autentificarPermissao(split[1], false)) {
+				return new ChavesModulo("podebanir", null);
+			}
+		}
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
+			return new ChavesModulo("podebanir", null);
 		}
 		cifrador.gerarRSA();
 		String chavePri = cifrador.getChavePri();
@@ -159,7 +169,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	// recebe chaveAES do cliente criptografada com RSA
 	public void enviarChaveAES(String nomeCliente, String chaveAEScriptograda) throws ServerNotActiveException {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return;
 		}
 		ChavesModulo chavesProCliente = tokenClientes.get(nomeCliente).getRemenChavesRSA();
@@ -177,7 +187,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	// recebe chavesHmac do cliente criptografada com RSA
 	public void enviarChaveHmac(String nomeCliente, String chaveHmaccriptograda) throws ServerNotActiveException {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return;
 		}
 		ChavesModulo chavesProCliente = tokenClientes.get(nomeCliente).getRemenChavesRSA();
@@ -195,7 +205,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	// recebe chavesRSA do cliente criptografada com RSA
 	public void enviarChavePubModulo(String nomeCliente, ChavesModulo chavePubModulo) throws ServerNotActiveException {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return;
 		}
 		String chavePub = chavePubModulo.getChavePub();
@@ -310,7 +320,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public Conta fazerLogin(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		TokenInfo tokenCliente = tokenClientes.get(nomeCliente);
@@ -353,7 +363,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public Conta fazerCadastro(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		TokenInfo tokenCliente = tokenClientes.get(nomeCliente);
@@ -391,7 +401,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public Conta removerConta(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -426,7 +436,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	// Funcionario only
 	public Veiculo adicionarVeiculo(String nomeCliente, Veiculo veiculo, String hash)
 			throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -457,7 +467,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	// Funcionario only
 	public Veiculo removerVeiculo(String nomeCliente, Veiculo veiculo, String hash) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -488,7 +498,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	// Funcionario only
 	public Veiculo atualizarVeiculo(String nomeCliente, Veiculo veiculo, String hash)
 			throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -520,7 +530,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	public Veiculo buscarVeiculoRenavam(String nomeCliente, String renavam, String hash)
 			throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -551,7 +561,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	public List<Veiculo> buscarVeiculoModelo(String nomeCliente, String modelo, String hash)
 			throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -588,7 +598,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	public List<Veiculo> listarVeiculos(String nomeCliente, String mensagem, String hash)
 			throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -619,7 +629,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	public List<Veiculo> listarVeiculosC(String nomeCliente, String categoria, String hash)
 			throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -664,7 +674,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public String getQntVeiculo(String nomeCliente, String mensagem, String hash) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -690,7 +700,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	public Veiculo comprarVeiculo(String nomeCliente, Conta conta, Veiculo veiculo, String hashConta,
 			String hashVeiculo) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -774,7 +784,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	public synchronized Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque, String hashConta,
 			String hashSaque) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -832,7 +842,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 	public synchronized Conta fazerDeposito(String nomeCliente, Conta conta, String valorDeposito, String hashConta,
 			String hashDeposito) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -886,7 +896,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	public synchronized Conta fazerTransferencia(String nomeCliente, Conta contaBeneficente, String valorTransferencia,
 			String emailFavorecido, String hashContaBene, String hashTransf, String hashEmailFavore)
 			throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {
@@ -962,7 +972,7 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	public Conta buscarConta(String nomeCliente, String emailConta, String hash) throws RemoteException, Exception {
-		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+		if (!autentificarPermissao(RemoteServer.getClientHost(), true)) {
 			return null;
 		}
 		if (autentificarLogin(nomeCliente)) {

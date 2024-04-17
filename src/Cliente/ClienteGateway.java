@@ -21,9 +21,13 @@ public class ClienteGateway {
 	private TokenInfo tokenServidor;
 	private Conta contaLogada = null;
 	private Scanner in = new Scanner(System.in);
+	private String host;
+	private int porta;
 
 	public ClienteGateway(String nome, String host, int porta) throws Exception {
 		this.nome = nome;
+		this.host = host;
+		this.porta = porta;
 		abrirServidorGateway(host, porta);
 	}
 
@@ -57,7 +61,7 @@ public class ClienteGateway {
 				ChavesModulo chaveModuloServidor = this.stubFirewall.receberChavePubModulo(this.nome);
 				if(chaveModuloServidor.getChavePub().equals("podebanir") && chaveModuloServidor.getModulo() == null) {
 					System.out.println("Você está banido!");
-					System.exit(0);
+					return;
 				}
 				System.out.println("Chaves do Servidor: ");
 				System.out.println(chaveModuloServidor);
@@ -119,13 +123,13 @@ public class ClienteGateway {
 	}
 
 	private boolean usuarioLogado() throws RemoteException, Exception {
-		return new Usuario(nome, stubFirewall, cifrador, contaLogada, "Você logou como um usuário comum", tokenServidor)
+		return new Usuario(nome, stubFirewall, cifrador, contaLogada, "Você logou como um usuário comum", tokenServidor, host, porta)
 				.iniciar();
 
 	}
 
 	private boolean funcionarioLogado() throws RemoteException, Exception {
-		return new Funcionario(nome, stubFirewall, cifrador, contaLogada, "Você logou como funcionário", tokenServidor)
+		return new Funcionario(nome, stubFirewall, cifrador, contaLogada, "Você logou como funcionário", tokenServidor, host, porta)
 				.iniciar();
 
 	}

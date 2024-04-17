@@ -7,6 +7,7 @@ import Modelos.Conta;
 import Modelos.TokenInfo;
 import Modelos.Veiculo;
 import Modelos.Veiculo.Categoria;
+import Processo.Cliente;
 import Modelos.Categorias.Economico;
 import Modelos.Categorias.Executivo;
 import Modelos.Categorias.Intermediario;
@@ -20,8 +21,8 @@ public class Funcionario extends Usuario {
 //	private Scanner in = new Scanner(System.in);
 
 	public Funcionario(String nome, ServidorGateway stubGateway, Cifrador cifrador, Conta contaLogada, String mensagem,
-			TokenInfo tokenServidor) throws RemoteException, Exception {
-		super(nome, stubGateway, cifrador, contaLogada, mensagem, tokenServidor);
+			TokenInfo tokenServidor, String host, int porta) throws RemoteException, Exception {
+		super(nome, stubGateway, cifrador, contaLogada, mensagem, tokenServidor, host, porta);
 	}
 
 	public boolean iniciar() throws RemoteException, Exception {
@@ -70,6 +71,7 @@ public class Funcionario extends Usuario {
 					break;
 				case 11:
 					System.out.println("Deslogando...");
+					new Cliente(this.nome, this.host, this.porta);
 					break;
 
 				}
