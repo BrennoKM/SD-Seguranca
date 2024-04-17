@@ -55,7 +55,10 @@ public class ClienteGateway {
 				tokenServidor = new TokenInfo();
 				cifrador = new Cifrador();
 				ChavesModulo chaveModuloServidor = this.stubFirewall.receberChavePubModulo(this.nome);
-
+				if(chaveModuloServidor.getChavePub().equals("podebanir") && chaveModuloServidor.getModulo() == null) {
+					System.out.println("Você está banido!");
+					System.exit(0);
+				}
 				System.out.println("Chaves do Servidor: ");
 				System.out.println(chaveModuloServidor);
 

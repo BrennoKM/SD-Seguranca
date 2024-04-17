@@ -29,8 +29,8 @@ public class IniciarServidorLoja {
 			// criar objeto servidor
 			ImplServidorLoja refObjetoRemoto = new ImplServidorLoja(arquivo);
 			ServidorLoja skeleton = (ServidorLoja) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
-			LocateRegistry.createRegistry(this.porta + modificadorPorta);
-			Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
+			
+			Registry registro = LocateRegistry.createRegistry(this.porta + modificadorPorta);
 			System.out.println("Registro: " + registro);
 			registro.rebind("rmi://" + hostLoja + "/ServidorLoja", skeleton);
 			System.out

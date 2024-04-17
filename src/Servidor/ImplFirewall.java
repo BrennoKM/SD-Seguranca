@@ -7,6 +7,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.RemoteServer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -86,8 +87,25 @@ public class ImplFirewall implements ServidorGateway {
 		if (mapSuspeitos.containsKey(nomeCliente)) {
 			if (mapSuspeitos.get(nomeCliente) == 3) {
 				System.out.println(
-						"\nFirewall -> Cliente " + nomeCliente + " foi bloqueado por tentativas excessivas de login");
+						"\nFirewall -> Cliente " + nomeCliente + " foi bloqueado por 10 segundo por tentativas excessivas de login");
 				permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+				final String ip = RemoteServer.getClientHost();
+				Thread th = new Thread(() -> {
+					try {
+						Thread.sleep(10000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					mapSuspeitos.remove(nomeCliente);
+					Iterator<Permissao> iterator = permissoes.iterator();
+					while (iterator.hasNext()) {
+					    Permissao p = iterator.next();
+					    if (p.getIp().equals(ip)) {
+					        iterator.remove();
+					    }
+					}
+				});
+				th.start();
 				return null;
 			}
 		}
@@ -119,11 +137,15 @@ public class ImplFirewall implements ServidorGateway {
 
 	public ChavesModulo receberChavePubModulo(String nomeCliente) throws RemoteException, Exception {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
-//			System.out.println("não recebeu chave");
 			return null;
 		}
-//		System.out.println("recebeu chave");
-		return stubGateway.receberChavePubModulo(nomeCliente);
+		ChavesModulo cm = stubGateway.receberChavePubModulo(nomeCliente);
+		if(cm.getChavePub().equals("podebanir") && cm.getModulo() == null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return cm;
+		}
+		return cm;
 	}
 
 	public void enviarChaveAES(String nomeCliente, String chaveAEScriptograda) throws RemoteException, Exception {
@@ -158,8 +180,13 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-
-		return stubGateway.adicionarVeiculo(nomeCliente, veiculo, hash);
+		Veiculo v = stubGateway.adicionarVeiculo(nomeCliente, veiculo, hash);
+		if(v.getRenavam().equals("podebanir") && v.getAno() == null && v.getModelo()==null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return v;
 	}
 
 	public Veiculo removerVeiculo(String nomeCliente, Veiculo veiculo, String hash) throws RemoteException, Exception {
@@ -167,7 +194,13 @@ public class ImplFirewall implements ServidorGateway {
 			return null;
 		}
 
-		return stubGateway.removerVeiculo(nomeCliente, veiculo, hash);
+		Veiculo v = stubGateway.removerVeiculo(nomeCliente, veiculo, hash);
+		if(v.getRenavam().equals("podebanir") && v.getAno() == null && v.getModelo()==null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return v;
 	}
 
 	public Veiculo atualizarVeiculo(String nomeCliente, Veiculo veiculo, String hash)
@@ -175,7 +208,13 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.atualizarVeiculo(nomeCliente, veiculo, hash);
+		Veiculo v = stubGateway.atualizarVeiculo(nomeCliente, veiculo, hash);
+		if(v.getRenavam().equals("podebanir") && v.getAno() == null && v.getModelo()==null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return v;
 	}
 
 	public Veiculo buscarVeiculoRenavam(String nomeCliente, String renavam, String hash)
@@ -183,7 +222,13 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.buscarVeiculoRenavam(nomeCliente, renavam, hash);
+		Veiculo v = stubGateway.buscarVeiculoRenavam(nomeCliente, renavam, hash);
+		if(v.getRenavam().equals("podebanir") && v.getAno() == null && v.getModelo()==null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return v;
 	}
 
 	public List<Veiculo> buscarVeiculoModelo(String nomeCliente, String modelo, String hash)
@@ -191,7 +236,14 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.buscarVeiculoModelo(nomeCliente, modelo, hash);
+		List<Veiculo> vlist = stubGateway.buscarVeiculoModelo(nomeCliente, modelo, hash);
+		Veiculo v = vlist.get(0);
+		if(v.getRenavam().equals("podebanir") && v.getAno() == null && v.getModelo()==null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return vlist;
 	}
 
 	public List<Veiculo> listarVeiculos(String nomeCliente, String mensagem, String hash)
@@ -199,7 +251,14 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.listarVeiculos(nomeCliente, mensagem, hash);
+		List<Veiculo> vlist = stubGateway.listarVeiculos(nomeCliente, mensagem, hash);
+		Veiculo v = vlist.get(0);
+		if(v.getRenavam().equals("podebanir") && v.getAno() == null && v.getModelo()==null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return vlist;
 	}
 
 	public List<Veiculo> listarVeiculosC(String nomeCliente, String categoria, String hash)
@@ -207,7 +266,14 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.listarVeiculosC(nomeCliente, categoria, hash);
+		List<Veiculo> vlist = stubGateway.listarVeiculosC(nomeCliente, categoria, hash);
+		Veiculo v = vlist.get(0);
+		if(v.getRenavam().equals("podebanir") && v.getAno() == null && v.getModelo()==null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return vlist;
 	}
 
 	public String getQntVeiculo(String nomeCliente, String mensagem, String hash) throws RemoteException, Exception {
@@ -222,7 +288,13 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.comprarVeiculo(nomeCliente, conta, veiculo, hashConta, hashVeiculo);
+		Veiculo v = stubGateway.comprarVeiculo(nomeCliente, conta, veiculo, hashConta, hashVeiculo);
+		if(v.getRenavam().equals("podebanir") && v.getAno() == null && v.getModelo()==null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return v;
 	}
 
 	public Conta fazerSaque(String nomeCliente, Conta conta, String valorSaque, String hashConta, String hashSaque)
@@ -230,7 +302,13 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.fazerSaque(nomeCliente, conta, valorSaque, hashConta, hashSaque);
+		Conta c = stubGateway.fazerSaque(nomeCliente, conta, valorSaque, hashConta, hashSaque);
+		if(c.getEmail().equals("podebanir") && c.getSenha() == null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return c;
 	}
 
 	public Conta fazerDeposito(String nomeCliente, Conta conta, String valorDeposito, String hashConta,
@@ -238,7 +316,13 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.fazerDeposito(nomeCliente, conta, valorDeposito, hashConta, hashDeposito);
+		Conta c = stubGateway.fazerDeposito(nomeCliente, conta, valorDeposito, hashConta, hashDeposito);
+		if(c.getEmail().equals("podebanir") && c.getSenha() == null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return c;
 	}
 
 	public Conta fazerTransferencia(String nomeCliente, Conta contaBeneficente, String valorTransferencia,
@@ -247,15 +331,27 @@ public class ImplFirewall implements ServidorGateway {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.fazerTransferencia(nomeCliente, contaBeneficente, valorTransferencia, emailFavorecido,
+		Conta c = stubGateway.fazerTransferencia(nomeCliente, contaBeneficente, valorTransferencia, emailFavorecido,
 				hashContaBene, hashTransf, hashEmailFavore);
+		if(c.getEmail().equals("podebanir") && c.getSenha() == null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return c;
 	}
 
 	public Conta buscarConta(String nomeCliente, String emailConta, String hash) throws RemoteException, Exception {
 		if (autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
 		}
-		return stubGateway.buscarConta(nomeCliente, emailConta, hash);
+		Conta c = stubGateway.buscarConta(nomeCliente, emailConta, hash);
+		if(c.getEmail().equals("podebanir") && c.getSenha() == null) {
+			System.out.println("Firewall -> Cliente " + RemoteServer.getClientHost() + " foi banido!");
+			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return null;
+		}
+		return c;
 	}
 
 	public boolean testarConexao() throws RemoteException, Exception {

@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import Modelos.Conta;
 import Modelos.Permissao;
 import Modelos.TokenInfo;
 import Modelos.Veiculo;
+import Modelos.Categorias.Executivo;
 import Modelos.Categorias.Intermediario;
 import Modelos.Veiculo.Categoria;
 import ServidorInterface.ServidorAutentificacao;
@@ -30,7 +32,6 @@ public class ImplServidorGateway implements ServidorGateway {
 	private Cifrador cifrador;
 	private ServidorAutentificacao stubAuth;
 	private ServidorLoja stubReplicas;
-	private Map<String, Integer> listaNegra = new HashMap<>();
 	private Map<String, TokenInfo> tokenClientes = new HashMap<>();
 	private Map<String, TokenInfo> tokenClientesLogados = new HashMap<>();
 	private List<Permissao> permissoes;
@@ -108,12 +109,36 @@ public class ImplServidorGateway implements ServidorGateway {
 			}
 		}
 	}
+	
+	public boolean analisarString(String string) throws ServerNotActiveException {
+		if (string.contains(";") || string.contains("/") || string.contains("INSERT") || string.contains("(")
+				|| string.contains(")")) {
+//			permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean autentificarPermissao(String ip) {
+		for (Permissao p : permissoes) {
+			if (p.getIp().equals(ip)) {
+				if (p.getPermicao()) {
+					return true;
+				} else {
+					System.out.println("\n\tGateway -> Recusado: " + ip);
+					return false;
+				}
+			}
+		}
+		System.out.println("\n\tGateway -> Adicionando na lista negra: " + ip);
+		permissoes.add(new Permissao(ip, porta, false));
+		return false;
+	}
 
 	// cliente recebe
-	public ChavesModulo receberChavePubModulo(String nomeCliente) {
-		if(listaNegra.containsKey(nomeCliente)) {
-			ChavesModulo cm = new ChavesModulo("Você está banido!!", null);
-			return cm;
+	public ChavesModulo receberChavePubModulo(String nomeCliente) throws ServerNotActiveException {
+		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+			return new ChavesModulo("Você está banido", null);
 		}
 		cifrador.gerarRSA();
 		String chavePri = cifrador.getChavePri();
@@ -133,8 +158,10 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	// recebe chaveAES do cliente criptografada com RSA
-	public void enviarChaveAES(String nomeCliente, String chaveAEScriptograda) {
-		
+	public void enviarChaveAES(String nomeCliente, String chaveAEScriptograda) throws ServerNotActiveException {
+		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+			return;
+		}
 		ChavesModulo chavesProCliente = tokenClientes.get(nomeCliente).getRemenChavesRSA();
 		String chavePri = chavesProCliente.getChavePri();
 		String modulo = chavesProCliente.getModulo();
@@ -149,7 +176,10 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	// recebe chavesHmac do cliente criptografada com RSA
-	public void enviarChaveHmac(String nomeCliente, String chaveHmaccriptograda) {
+	public void enviarChaveHmac(String nomeCliente, String chaveHmaccriptograda) throws ServerNotActiveException {
+		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+			return;
+		}
 		ChavesModulo chavesProCliente = tokenClientes.get(nomeCliente).getRemenChavesRSA();
 		String chavePri = chavesProCliente.getChavePri();
 		String modulo = chavesProCliente.getModulo();
@@ -164,7 +194,10 @@ public class ImplServidorGateway implements ServidorGateway {
 	}
 
 	// recebe chavesRSA do cliente criptografada com RSA
-	public void enviarChavePubModulo(String nomeCliente, ChavesModulo chavePubModulo) {
+	public void enviarChavePubModulo(String nomeCliente, ChavesModulo chavePubModulo) throws ServerNotActiveException {
+		if (!autentificarPermissao(RemoteServer.getClientHost())) {
+			return;
+		}
 		String chavePub = chavePubModulo.getChavePub();
 		String modulo = chavePubModulo.getModulo();
 
@@ -175,15 +208,6 @@ public class ImplServidorGateway implements ServidorGateway {
 
 //		System.out.println(this.tokenClientes.get(nomeCliente));
 
-	}
-
-	public boolean analisarString(String string) {
-		if (string.contains(";") || string.contains("/") || string.contains("INSERT") || string.contains("(")
-				|| string.contains(")")) {
-			
-			return true;
-		}
-		return false;
 	}
 
 	private Conta requisicaoGateway(String nomeCliente, String chaveAEScliente, Conta conta, String tipo)
@@ -285,18 +309,6 @@ public class ImplServidorGateway implements ServidorGateway {
 		return false;
 	}
 
-	private boolean autentificarPermissao(String ip) {
-		for (Permissao p : permissoes) {
-			if (p.getIp().equals(ip)) {
-				if (p.getPermicao()) {
-					return true;
-				}
-			}
-		}
-		System.out.println("\n\tGateway -> Recusado: " + ip);
-		return false;
-	}
-
 	public Conta fazerLogin(String nomeCliente, Conta conta, String hash) throws RemoteException, Exception {
 		if (!autentificarPermissao(RemoteServer.getClientHost())) {
 			return null;
@@ -353,7 +365,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 		conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "cadastro");
 		if(conta == null) {
-			return null;
+			return new Conta("podebanir", null);
 		}
 		
 		String msgPrivada = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
@@ -391,7 +403,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			}
 			conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "remoção");
 			if(conta == null) {
-				return null;
+				return new Conta("podebanir", null);
 			}
 			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateAuth, mensagemPrivada);
@@ -427,7 +439,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "inserção");
 			if(veiculo == null) {
-				return null;
+				return new Executivo("podebanir", null, null, null);
 			}
 			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
@@ -457,7 +469,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "remoção");
 			if(veiculo == null) {
-				return null;
+				return new Executivo("podebanir", null, null, null);
 			}
 			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
@@ -489,7 +501,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "atualização");
 			if(veiculo == null) {
-				return null;
+				return new Executivo("podebanir", null, null, null);
 			}
 			
 			
@@ -521,7 +533,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			renavam = requisicaoGateway(nomeCliente, chaveAEScliente, renavam, "busca Renavam", chaveAES_GateLoja);
 			if(renavam == null) {
-				return null;
+				return new Executivo("podebanir", null, null, null);
 			}
 			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
@@ -552,8 +564,13 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			modelo = requisicaoGateway(nomeCliente, chaveAEScliente, modelo, "busca modelo", chaveAES_GateLoja);
 			if(modelo == null) {
-				return null;
+				Veiculo banir = new Executivo("podebanir", null, null, null);
+				List<Veiculo> banindo = new ArrayList<Veiculo>();
+				banindo.add(banir);
+				return banindo;
 			}
+			
+			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			List<Veiculo> veiculoBusca = stubReplicas.buscarVeiculoPorModelo(msgPrivada, modelo);
 			if (veiculoBusca != null) {
@@ -582,6 +599,9 @@ public class ImplServidorGateway implements ServidorGateway {
 				return null;
 			}
 			requisicaoGateway(nomeCliente, chaveAEScliente, "listar veículos");
+			
+			
+			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			List<Veiculo> veiculoBusca = stubReplicas.getVeiculos(msgPrivada);
 			if (veiculoBusca != null) {
@@ -690,7 +710,7 @@ public class ImplServidorGateway implements ServidorGateway {
 //			System.out.println("continha "+conta);
 			conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "ler conta");
 			if(conta == null) {
-				return null;
+				return new Executivo("podebanir", null, null, null);
 			}
 //			System.out.println(conta);
 			conta = stubAuth.buscarConta(msgPrivadaAuth, conta.getEmail());
@@ -703,7 +723,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			// busca o veiculo no bando de dados
 			veiculo = requisicaoGateway(nomeCliente, chaveAEScliente, veiculo, "comprar veiculo");
 			if(veiculo == null) {
-				return null;
+				return new Executivo("podebanir", null, null, null);
 			}
 			veiculo = stubReplicas.buscarVeiculoPorRenavam(msgPrivadaLoja, veiculo.getRenavam());
 			if (veiculo == null) {
@@ -773,7 +793,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			valorSaque = cifrador.descriptografar(chaveAEScliente, valorSaque);
 			conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "saque de " + valorSaque);
 			if(conta == null) {
-				return null;
+				return new Conta("podebanir", null);
 			}
 			conta = stubAuth.buscarConta(msgPrivadaAuth, conta.getEmail());
 			if (conta == null) {
@@ -831,7 +851,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			valorDeposito = cifrador.descriptografar(chaveAEScliente, valorDeposito);
 			conta = requisicaoGateway(nomeCliente, chaveAEScliente, conta, "deposito de " + valorDeposito);
 			if(conta == null) {
-				return null;
+				return new Conta("podebanir", null);
 			}
 			conta = stubAuth.buscarConta(msgPrivadaAuth, conta.getEmail());
 			if (conta == null) {
@@ -894,9 +914,14 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			String emailBeneficente = contaBeneficente.getEmail();
 			contaBeneficente = buscarConta(nomeCliente, emailBeneficente, "eupodo");
+			
 			if (contaBeneficente == null) {
 				System.out.println("\t\t-> Conta beneficente não encontrada");
 				return null;
+			} else {
+				if(contaBeneficente.getEmail().equals("podebanir") && contaBeneficente.getSenha() == null){
+					return new Conta("podebanir", null);
+				}
 			}
 			contaBeneficente = cifrador.descriptografar(chaveAEScliente, contaBeneficente);
 			valorTransferencia = cifrador.descriptografar(chaveAEScliente, valorTransferencia);
@@ -954,7 +979,7 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			emailConta = requisicaoGateway(nomeCliente, chaveAEScliente, emailConta, "buscar conta", chaveAES_GateAuth);
 			if(emailConta == null) {
-				return null;
+				return new Conta("podebanir", null);
 			}
 			Conta conta = stubAuth.buscarConta(msgPrivadaAuth, emailConta);
 			if (conta != null) {

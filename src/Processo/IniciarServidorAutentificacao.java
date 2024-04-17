@@ -29,8 +29,8 @@ public class IniciarServidorAutentificacao {
 			ImplServidorAutentificacao refObjetoRemoto = new ImplServidorAutentificacao();
 			ServidorAutentificacao skeleton = (ServidorAutentificacao) UnicastRemoteObject.exportObject(refObjetoRemoto,
 					0);
-			LocateRegistry.createRegistry(this.porta + modificadorPorta);
-			Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
+
+			Registry registro = LocateRegistry.createRegistry(this.porta + modificadorPorta);
 			System.out.println("Registro: " + registro);
 			registro.rebind("rmi://" + hostAuth + "/ServidorAutentificacao", skeleton);
 			System.out.println(

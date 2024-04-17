@@ -38,8 +38,8 @@ public class IniciarServidorGateway {
 			// criar objeto servidor
 			ImplServidorGateway refObjetoRemoto = new ImplServidorGateway(hostGate, hostFirewall, hostAuth, hostReplicas, porta);
 			ServidorGateway skeleton = (ServidorGateway) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
-			LocateRegistry.createRegistry(porta + modificadorPorta);
-			Registry registro = LocateRegistry.getRegistry(porta + modificadorPorta);
+			
+			Registry registro = LocateRegistry.createRegistry(porta + modificadorPorta);
 			System.out.println("Registro: " + registro);
 //			registro.rebind("ServidorGateway", skeleton);
 			registro.rebind("rmi://" + hostGate + "/ServidorGateway", skeleton);

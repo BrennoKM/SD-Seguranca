@@ -35,8 +35,8 @@ public class IniciarFirewall {
 			// criar objeto servidor
 			ImplFirewall refObjetoRemoto = new ImplFirewall(hostGateway, porta);
 			ServidorGateway skeleton = (ServidorGateway) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
-			LocateRegistry.createRegistry(porta + modificadorPorta);
-			Registry registro = LocateRegistry.getRegistry(porta + modificadorPorta);
+			
+			Registry registro = LocateRegistry.createRegistry(porta + modificadorPorta);
 			System.out.println("Registro: " + registro);
 //			registro.rebind("ServidorGateway", skeleton);
 			registro.rebind("rmi://" + hostFirewall + "/ServidorFirewall", skeleton);

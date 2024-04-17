@@ -28,8 +28,8 @@ public class IniciarReplicasControl {
             // criar objeto servidor
             ImplReplicasControl refObjetoRemoto = new ImplReplicasControl(hostsLojas, portasLojas);
             ServidorLoja skeleton = (ServidorLoja) UnicastRemoteObject.exportObject(refObjetoRemoto, 0);
-            LocateRegistry.createRegistry(this.porta + modificadorPorta);
-            Registry registro = LocateRegistry.getRegistry(this.porta + modificadorPorta);
+            
+            Registry registro = LocateRegistry.createRegistry(this.porta + modificadorPorta);
             System.out.println("Registro: " + registro);
             registro.rebind("rmi://" + hostReplicas + "/ReplicasControl", skeleton);
             System.out
