@@ -7,12 +7,13 @@ import Processo.IniciarServidorLoja;
 
 @SuppressWarnings("unused")
 public class IniciarServidores{
-	static String hostFirewall = "10.215.30.122";
-	static String hostGateway = "10.215.30.122";
-	static String hostAuth = "10.215.30.122";
-	static String hostLoja = "10.215.30.122";
-	static String hostReplicas = "10.215.30.122";
-	static String[] hostsLojas = {"10.215.30.122", "10.215.30.122", "10.215.30.122"};
+	static String host = "192.168.137.1";
+	static String hostFirewall = host;
+	static String hostGateway = host;
+	static String hostAuth = host;
+	static String hostLoja = host;
+	static String hostReplicas = host;
+	static String[] hostsLojas = {host, host, host};
 	static int[] portasLojas = {1099+3+0, 1099+3+1, 1099+3+2};
 	static int portaInicial = 1099;
 

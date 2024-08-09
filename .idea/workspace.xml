@@ -1,56 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="19957c5b-5153-4fcb-83ee-725781b19990" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/.classpath" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/BancoDeDados/ContaManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/BancoDeDados/VeiculoManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/ChavesModulo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/CifraAES.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/Cifrador.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/Hmac.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/RSA.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cliente/ClienteGateway.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cliente/Funcionario.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cliente/Usuario.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/IniciarCliente.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/IniciarServidores.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Economico.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Executivo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Intermediario.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Conta.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Mensagem.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/TokenInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Veiculo$Categoria.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Veiculo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/Cliente.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarReplicasControl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorAutentificacao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorGateway.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorLoja.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplReplicasControl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorAutentificacao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorGateway.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorLoja.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorAutentificacao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorGateway.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorLoja.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BancoDeDados/ContaManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BancoDeDados/ContaManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Cliente/ClienteGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cliente/ClienteGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/BancoDeDados/ContaManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/BancoDeDados/ContaManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/BancoDeDados/VeiculoManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/BancoDeDados/VeiculoManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/ChavesModulo.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/ChavesModulo.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/CifraAES.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/CifraAES.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/Cifrador.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/Cifrador.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/Hmac.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/Hmac.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cifra/RSA.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/RSA.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cliente/ClienteGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cliente/ClienteGateway.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cliente/Funcionario.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cliente/Funcionario.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Cliente/Usuario.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cliente/Usuario.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/IniciarCliente.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/IniciarCliente.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/IniciarServidores.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/IniciarServidores.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Economico.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Categorias/Economico.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Executivo.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Categorias/Executivo.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Intermediario.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Categorias/Intermediario.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Conta.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Conta.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Mensagem.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Mensagem.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Permissao.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Permissao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/TokenInfo.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/TokenInfo.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Veiculo$Categoria.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Veiculo$Categoria.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Modelos/Veiculo.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Veiculo.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/Cliente.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/Cliente.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarFirewall.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarFirewall.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarReplicasControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarReplicasControl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorAutentificacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarServidorAutentificacao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarServidorGateway.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorLoja.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarServidorLoja.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplFirewall.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplFirewall.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplReplicasControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplReplicasControl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorAutentificacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplServidorAutentificacao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplServidorGateway.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorLoja.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplServidorLoja.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorAutentificacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ServidorInterface/ServidorAutentificacao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ServidorInterface/ServidorGateway.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorLoja.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ServidorInterface/ServidorLoja.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IniciarCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IniciarCliente.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IniciarServidores.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IniciarServidores.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Processo/IniciarServidorGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Processo/IniciarServidorGateway.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplReplicasControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplReplicasControl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplServidorAutentificacao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplServidorAutentificacao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplServidorGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplServidorGateway.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ServidorInterface/ServidorAutentificacao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ServidorInterface/ServidorAutentificacao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ServidorInterface/ServidorGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ServidorInterface/ServidorGateway.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,41 +53,63 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "kuchinawa"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;kuchinawa&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/BrennoKM/SD-Seguranca.git",
-    "accountId": "28c6cd5a-5d92-4bed-95be-b1ea9c52f963"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/BrennoKM/SD-Seguranca.git&quot;,
+    &quot;accountId&quot;: &quot;a3447f2a-ae78-4dfc-848c-77229ea6045f&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2fCFmRi3s0dZg56IYZcPj0SYHmr" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="flattenModules" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Kuchinawa/IdeaProjects/SD - praticaOff2",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ContaManager.executor&quot;: &quot;Run&quot;,
+    &quot;Application.IniciarCliente.executor&quot;: &quot;Run&quot;,
+    &quot;Application.IniciarServidores.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Kuchinawa/IdeaProjects/SD - praticaOff2&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager">
+}</component>
+  <component name="RunManager" selected="Application.IniciarCliente">
+    <configuration name="IniciarCliente" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="IniciarCliente" />
+      <module name="SD - praticaOff2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IniciarServidores" type="Application" factoryName="Application" singleton="false" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="IniciarServidores" />
+      <module name="SD - praticaOff2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
         <option name="Make" enabled="true" />
@@ -106,12 +121,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.IniciarCliente" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.18034.62" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.18034.62" />
       </set>
     </attachedChunks>
   </component>
@@ -124,6 +144,8 @@
       <option name="presentableId" value="Default" />
       <updated>1713297311837</updated>
       <workItem from="1713297312918" duration="30000" />
+      <workItem from="1723233751067" duration="2124000" />
+      <workItem from="1723237425519" duration="11000" />
     </task>
     <servers />
   </component>
