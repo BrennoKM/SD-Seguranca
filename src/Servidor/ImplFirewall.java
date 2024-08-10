@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import Cifra.ChavesModulo;
 import Modelos.Conta;
@@ -23,8 +25,10 @@ public class ImplFirewall implements ServidorGateway {
 	private ServidorGateway stubGateway;
 	private List<Permissao> permissoes;
 	private Map<String, Integer> mapSuspeitos = new HashMap<>();
+	private ExecutorService executor = null;
 
 	public ImplFirewall(String hostGateway, int porta) throws Exception {
+		executor = Executors.newSingleThreadExecutor();
 		iniciarPermisoes();
 		abrirServidorGateway(hostGateway, porta);
 		this.porta = porta;
@@ -90,7 +94,7 @@ public class ImplFirewall implements ServidorGateway {
 						"\nFirewall -> Cliente " + nomeCliente + " foi bloqueado por 10 segundo por tentativas excessivas de login");
 				permissoes.add(new Permissao(RemoteServer.getClientHost(), this.porta, false));
 				final String ip = RemoteServer.getClientHost();
-				Thread th = new Thread(() -> {
+				Runnable bloquear = () -> {
 					try {
 						Thread.sleep(10000);
 					} catch (InterruptedException e) {
@@ -99,13 +103,31 @@ public class ImplFirewall implements ServidorGateway {
 					mapSuspeitos.remove(nomeCliente);
 					Iterator<Permissao> iterator = permissoes.iterator();
 					while (iterator.hasNext()) {
-					    Permissao p = iterator.next();
-					    if (p.getIp().equals(ip)) {
-					        iterator.remove();
-					    }
+						Permissao p = iterator.next();
+						if (p.getIp().equals(ip)) {
+							iterator.remove();
+						}
 					}
-				});
-				th.start();
+				};
+				executor.execute(bloquear);
+
+//				Thread th = new Thread(() -> {
+//					try {
+//						Thread.sleep(10000);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//					mapSuspeitos.remove(nomeCliente);
+//					Iterator<Permissao> iterator = permissoes.iterator();
+//					while (iterator.hasNext()) {
+//					    Permissao p = iterator.next();
+//					    if (p.getIp().equals(ip)) {
+//					        iterator.remove();
+//					    }
+//					}
+//				});
+//				th.start();
+
 				return null;
 			}
 		}

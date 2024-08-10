@@ -4,59 +4,42 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="19957c5b-5153-4fcb-83ee-725781b19990" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="19957c5b-5153-4fcb-83ee-725781b19990" name="Changes" comment="Atualização:&#10;- Preparando novo ambiente IntelliJ&#10;&#10;Atualizações futuras:&#10;- Recursos de Threads com Executores&#10;- Programação funcional (interface e afins)">
+      <change afterPath="$PROJECT_DIR$/src/Servidor/Interfaces.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/BancoDeDados/ContaManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/BancoDeDados/ContaManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/BancoDeDados/VeiculoManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/BancoDeDados/VeiculoManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/ChavesModulo.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/ChavesModulo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/CifraAES.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/CifraAES.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/Cifrador.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/Cifrador.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/Hmac.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/Hmac.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cifra/RSA.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cifra/RSA.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cliente/ClienteGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cliente/ClienteGateway.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cliente/Funcionario.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cliente/Funcionario.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Cliente/Usuario.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Cliente/Usuario.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/IniciarCliente.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/IniciarCliente.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/IniciarServidores.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/IniciarServidores.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Economico.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Categorias/Economico.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Executivo.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Categorias/Executivo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Categorias/Intermediario.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Categorias/Intermediario.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Conta.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Conta.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Mensagem.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Mensagem.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Permissao.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Permissao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/TokenInfo.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/TokenInfo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Veiculo$Categoria.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Veiculo$Categoria.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Modelos/Veiculo.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Modelos/Veiculo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/Cliente.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/Cliente.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarFirewall.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarFirewall.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarReplicasControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarReplicasControl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorAutentificacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarServidorAutentificacao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarServidorGateway.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Processo/IniciarServidorLoja.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Processo/IniciarServidorLoja.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplFirewall.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplFirewall.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplReplicasControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplReplicasControl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorAutentificacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplServidorAutentificacao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplServidorGateway.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorLoja.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplServidorLoja.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorAutentificacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ServidorInterface/ServidorAutentificacao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ServidorInterface/ServidorGateway.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorLoja.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ServidorInterface/ServidorLoja.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IniciarCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IniciarCliente.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IniciarServidores.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IniciarServidores.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplFirewall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplFirewall.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplReplicasControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplReplicasControl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/veiculos2.ser" beforeDir="false" afterPath="$PROJECT_DIR$/veiculos2.ser" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
+    {
+      &quot;state&quot;: &quot;OPEN&quot;
+    }
+  ],
   &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;kuchinawa&quot;
+    &quot;state&quot;: &quot;OPEN&quot;
   }
 }</component>
   <component name="GithubPullRequestsUISettings">{
@@ -146,10 +129,37 @@
       <workItem from="1713297312918" duration="30000" />
       <workItem from="1723233751067" duration="2124000" />
       <workItem from="1723237425519" duration="11000" />
+      <workItem from="1723238239216" duration="1062000" />
+      <workItem from="1723300632167" duration="6112000" />
     </task>
+    <task id="LOCAL-00001" summary="Atualização:&#10;- Preparando novo ambiente IntelliJ&#10;&#10;Atualizações futuras:&#10;- Recursos de Threads com Executores&#10;- Programação funcional (interface e afins)">
+      <option name="closed" value="true" />
+      <created>1723238429887</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1723238429887</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value=".." />
+    <MESSAGE value="Atualização:&#10;- Preparando novo ambiente IntelliJ&#10;&#10;Atualizações futuras:&#10;- Recursos de Threads com Executores&#10;- Programação funcional (interface e afins)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Atualização:&#10;- Preparando novo ambiente IntelliJ&#10;&#10;Atualizações futuras:&#10;- Recursos de Threads com Executores&#10;- Programação funcional (interface e afins)" />
   </component>
 </project>

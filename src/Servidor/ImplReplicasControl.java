@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import Modelos.Veiculo;
 import Modelos.Veiculo.Categoria;
@@ -21,18 +24,32 @@ public class ImplReplicasControl implements ServidorLoja {
 	private int indiceLider = -1;
 	private ArrayList<Integer> indices = new ArrayList<Integer>();
 	private Map<Integer, ServidorLoja> mapLojas = new HashMap<>();
+	private ExecutorService executor = null;
 
 	public ImplReplicasControl(String[] hostsLojas, int[] portasLojas) throws Exception {
+		executor = Executors.newFixedThreadPool(hostsLojas.length);
+
 		for (int i = 0; i < hostsLojas.length; i++) {
+
 			final int index = i;
-			Thread thread = new Thread(() -> {
+			Runnable conectar = () -> {
 				try {
 					abrirServidorLoja(index, hostsLojas[index], portasLojas[index]);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			});
-			thread.start();
+			};
+			executor.execute(conectar);
+//			System.out.println("\u001B[32mLoja adicionada " + index + "\u001B[0m");
+
+//			Thread thread = new Thread(() -> {
+//				try {
+//					abrirServidorLoja(index, hostsLojas[index], portasLojas[index]);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			});
+//			thread.start();
 		}
 
 	}
@@ -175,7 +192,20 @@ public class ImplReplicasControl implements ServidorLoja {
 	}
 
 	public List<Veiculo> buscarVeiculoPorModelo(String mensagem, String modelo) throws Exception {
-		return getStubRead().buscarVeiculoPorModelo(mensagem, modelo);
+
+		List<Veiculo> veiculos = getStubRead().getVeiculos(mensagem);
+		List<Veiculo> veiculosFiltrados = new ArrayList<>();
+
+		// Usando função lambda para filtrar veículos ao inves de implementação dificil de ler (comparar com VeiculoManager.java)
+		FiltroVeiculo filtro = veiculo -> veiculo.getModelo().equalsIgnoreCase(modelo);
+
+		for (Veiculo veiculo : veiculos) {
+			if (filtro.filtrar(veiculo)) {
+				veiculosFiltrados.add(veiculo);
+			}
+		}
+
+		return veiculosFiltrados;
 	}
 
 	public List<Veiculo> getVeiculos(String mensagem) throws Exception {
@@ -261,9 +291,14 @@ public class ImplReplicasControl implements ServidorLoja {
 //			System.out.println("for att");
 			if (i != this.indiceLider) {
 				ServidorLoja stub = mapLojas.get(i);
-				if (stub.atualizarVeiculo(mensagem, veiculo) == null) {
-					stub.adicionarVeiculo(mensagem, veiculo);
-				}
+
+				AtualizacaoVeiculo atualizacao = (msg, v) -> {
+					if (stub.atualizarVeiculo(msg, v) == null) {
+						stub.adicionarVeiculo(msg, v);
+					}
+				};
+				atualizacao.atualizar(mensagem, veiculo);
+
 			}
 		}
 	}
