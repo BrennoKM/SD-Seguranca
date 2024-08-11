@@ -4,15 +4,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import Modelos.Veiculo;
 import Modelos.Veiculo.Categoria;
@@ -24,7 +18,8 @@ public class ImplReplicasControl implements ServidorLoja {
 	private int indiceLider = -1;
 	private ArrayList<Integer> indices = new ArrayList<Integer>();
 	private Map<Integer, ServidorLoja> mapLojas = new HashMap<>();
-	private ExecutorService executor = null;
+	private ExecutorService executor;
+	private int roundRobinIndex = 0;
 
 	public ImplReplicasControl(String[] hostsLojas, int[] portasLojas) throws Exception {
 		executor = Executors.newFixedThreadPool(hostsLojas.length);
@@ -163,17 +158,20 @@ public class ImplReplicasControl implements ServidorLoja {
 		}
 	}
 
-	public ServidorLoja getStubRead() {
+
+	// original
+	public ServidorLoja getStubRead(String key) {
 		for (int i : indices) {
 			ServidorLoja stub = testarLoja(i);
 			if (stub == null) {
-				stub = getStubRead();
+				stub = getStubRead(key);
 			}
 			return stub;
 		}
-//		System.out.println("saindo getstubread");
 		return null;
 	}
+
+
 
 	public ServidorLoja getStubWrite() {
 		ServidorLoja stub = testarLoja(this.indiceLider);
@@ -187,18 +185,17 @@ public class ImplReplicasControl implements ServidorLoja {
 		return null;
 	}
 
-	public Veiculo buscarVeiculoPorRenavam(String mensagem, String renavam) throws Exception {
-		return getStubRead().buscarVeiculoPorRenavam(mensagem, renavam);
+	public Veiculo buscarVeiculoPorRenavam(String ipCliente, String mensagem, String renavam) throws Exception {
+		return getStubRead(ipCliente).buscarVeiculoPorRenavam(ipCliente, mensagem, renavam);
 	}
 
-	public List<Veiculo> buscarVeiculoPorModelo(String mensagem, String modelo) throws Exception {
+	public List<Veiculo> buscarVeiculoPorModelo(String ipCliente, String mensagem, String modelo) throws Exception {
 
-		List<Veiculo> veiculos = getStubRead().getVeiculos(mensagem);
+		List<Veiculo> veiculos = getStubRead(ipCliente).getVeiculos(ipCliente, mensagem);
 		List<Veiculo> veiculosFiltrados = new ArrayList<>();
 
 		// Usando função lambda para filtrar veículos ao inves de implementação dificil de ler (comparar com VeiculoManager.java)
 		FiltroVeiculo filtro = veiculo -> veiculo.getModelo().equalsIgnoreCase(modelo);
-
 		for (Veiculo veiculo : veiculos) {
 			if (filtro.filtrar(veiculo)) {
 				veiculosFiltrados.add(veiculo);
@@ -208,17 +205,17 @@ public class ImplReplicasControl implements ServidorLoja {
 		return veiculosFiltrados;
 	}
 
-	public List<Veiculo> getVeiculos(String mensagem) throws Exception {
+	public List<Veiculo> getVeiculos(String ipCliente, String mensagem) throws Exception {
 //		System.out.println("getveic");
-		return getStubRead().getVeiculos(mensagem);
+		return getStubRead(ipCliente).getVeiculos(ipCliente, mensagem);
 	}
 
-	public List<Veiculo> getVeiculos(String mensagem, Categoria categoria) throws RemoteException, Exception {
-		return getStubRead().getVeiculos(mensagem, categoria);
+	public List<Veiculo> getVeiculos(String ipCliente, String mensagem, Categoria categoria) throws RemoteException, Exception {
+		return getStubRead(ipCliente).getVeiculos(ipCliente, mensagem, categoria);
 	}
 
-	public String getQntVeiculos(String mensagem) throws Exception {
-		return getStubRead().getQntVeiculos(mensagem);
+	public String getQntVeiculos(String ipCliente, String mensagem) throws Exception {
+		return getStubRead(ipCliente).getQntVeiculos(ipCliente, mensagem);
 	}
 
 	public Veiculo adicionarVeiculo(String mensagem, Veiculo veiculo) throws Exception {

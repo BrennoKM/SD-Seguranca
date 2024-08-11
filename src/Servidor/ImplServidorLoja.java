@@ -30,7 +30,7 @@ public class ImplServidorLoja implements ServidorLoja {
 		return false;
 	}
 
-	public Veiculo buscarVeiculoPorRenavam(String mensagem, String renavam) throws Exception {
+	public Veiculo buscarVeiculoPorRenavam(String ipCliente, String mensagem, String renavam) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
 		renavam = cifrador.descriptografar(renavam);
 		if (autentificar(mensagem)) {
@@ -45,7 +45,7 @@ public class ImplServidorLoja implements ServidorLoja {
 		return null;
 	}
 
-	public List<Veiculo> buscarVeiculoPorModelo(String mensagem, String modelo) throws Exception {
+	public List<Veiculo> buscarVeiculoPorModelo(String ipCliente, String mensagem, String modelo) throws Exception {
 		List<Veiculo> veiculos;
 		mensagem = cifrador.descriptografar(mensagem);
 		modelo = cifrador.descriptografar(modelo);
@@ -64,7 +64,7 @@ public class ImplServidorLoja implements ServidorLoja {
 		return null;
 	}
 
-	public List<Veiculo> getVeiculos(String mensagem) throws Exception {
+	public List<Veiculo> getVeiculos(String ipCliente, String mensagem) throws Exception {
 		List<Veiculo> veiculos;
 		mensagem = cifrador.descriptografar(mensagem);
 		if (autentificar(mensagem)) {
@@ -82,7 +82,7 @@ public class ImplServidorLoja implements ServidorLoja {
 		return null;
 	}
 
-	public List<Veiculo> getVeiculos(String mensagem, Categoria categoria) throws Exception {
+	public List<Veiculo> getVeiculos(String ipCliente, String mensagem, Categoria categoria) throws Exception {
 		List<Veiculo> veiculos;
 		mensagem = cifrador.descriptografar(mensagem);
 		if (autentificar(mensagem)) {
@@ -171,7 +171,7 @@ public class ImplServidorLoja implements ServidorLoja {
 		return null;
 	}
 
-	public String getQntVeiculos(String mensagem) throws Exception {
+	public String getQntVeiculos(String ipCliente, String mensagem) throws Exception {
 		mensagem = cifrador.descriptografar(mensagem);
 		if (autentificar(mensagem)) {
 			String qntVeiculos = Integer.toString(bd_veiculos.getQntVeiculos());
@@ -193,7 +193,7 @@ public class ImplServidorLoja implements ServidorLoja {
 		Veiculo v = new Intermediario("12345678905", "Ford ka sedan", "2024", "61000");
 		v = cifrador.criptografar(cifrador.getChaveAES(), v);
 		isl.atribuirDono(mensagem, v, email);
-		isl.buscarVeiculoPorModelo(mensagem, modelo);
+		isl.buscarVeiculoPorModelo("wa",mensagem, modelo);
 	}
 
 	@Override

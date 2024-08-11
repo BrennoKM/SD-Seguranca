@@ -5,17 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19957c5b-5153-4fcb-83ee-725781b19990" name="Changes" comment="Atualização:&#10;- Preparando novo ambiente IntelliJ&#10;&#10;Atualizações futuras:&#10;- Recursos de Threads com Executores&#10;- Programação funcional (interface e afins)">
-      <change afterPath="$PROJECT_DIR$/src/Servidor/Interfaces.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/IniciarCliente.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/IniciarCliente.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/IniciarServidores.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/IniciarServidores.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplFirewall.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplFirewall.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplReplicasControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplReplicasControl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/IniciarCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IniciarCliente.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorGateway.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplServidorGateway.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Servidor/ImplServidorLoja.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Servidor/ImplServidorLoja.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/ServidorInterface/ServidorLoja.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ServidorInterface/ServidorLoja.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IniciarServidores.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IniciarServidores.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplFirewall.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplFirewall.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Servidor/ImplReplicasControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplReplicasControl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/veiculos2.ser" beforeDir="false" afterPath="$PROJECT_DIR$/veiculos2.ser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplServidorGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplServidorGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Servidor/ImplServidorLoja.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Servidor/ImplServidorLoja.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ServidorInterface/ServidorLoja.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ServidorInterface/ServidorLoja.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +130,8 @@
       <workItem from="1723233751067" duration="2124000" />
       <workItem from="1723237425519" duration="11000" />
       <workItem from="1723238239216" duration="1062000" />
-      <workItem from="1723300632167" duration="6112000" />
+      <workItem from="1723300632167" duration="8096000" />
+      <workItem from="1723378796223" duration="2845000" />
     </task>
     <task id="LOCAL-00001" summary="Atualização:&#10;- Preparando novo ambiente IntelliJ&#10;&#10;Atualizações futuras:&#10;- Recursos de Threads com Executores&#10;- Programação funcional (interface e afins)">
       <option name="closed" value="true" />

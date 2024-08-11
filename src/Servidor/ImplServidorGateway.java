@@ -559,7 +559,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			}
 			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			Veiculo veiculoBusca = stubReplicas.buscarVeiculoPorRenavam(msgPrivada, renavam);
+			Veiculo veiculoBusca = stubReplicas.buscarVeiculoPorRenavam(nomeCliente, msgPrivada, renavam);
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo encontrado!");
 				veiculoBusca = cifrador.descriptografar(chaveAES_GateLoja, veiculoBusca);
@@ -594,7 +594,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			
 			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			List<Veiculo> veiculoBusca = stubReplicas.buscarVeiculoPorModelo(msgPrivada, modelo);
+			List<Veiculo> veiculoBusca = stubReplicas.buscarVeiculoPorModelo(nomeCliente, msgPrivada, modelo);
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo(s) encontrado(s)!");
 				for (Veiculo veiculo : veiculoBusca) {
@@ -625,7 +625,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			
 			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			List<Veiculo> veiculoBusca = stubReplicas.getVeiculos(msgPrivada);
+			List<Veiculo> veiculoBusca = stubReplicas.getVeiculos(nomeCliente, msgPrivada);
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo(s) encontrado(s)!");
 				for (Veiculo veiculo : veiculoBusca) {
@@ -667,10 +667,10 @@ public class ImplServidorGateway implements ServidorGateway {
 
 			if (c != null) {
 				System.out.println("\t\tCategoria recebida: " + c.toString());
-				veiculoBusca = stubReplicas.getVeiculos(msgPrivada, c);
+				veiculoBusca = stubReplicas.getVeiculos(nomeCliente, msgPrivada, c);
 			} else {
 				System.out.println("\t\tCategoria recebida é invalida! Todas categorias serão exibidas.");
-				veiculoBusca = stubReplicas.getVeiculos(msgPrivada);
+				veiculoBusca = stubReplicas.getVeiculos(nomeCliente, msgPrivada);
 			}
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo(s) encontrado(s)!");
@@ -698,7 +698,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			}
 			requisicaoGateway(nomeCliente, chaveAEScliente, "quantidade veículos");
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
-			String quantidade = stubReplicas.getQntVeiculos(msgPrivada);
+			String quantidade = stubReplicas.getQntVeiculos(nomeCliente, msgPrivada);
 			if (quantidade != null) {
 				System.out.println("\t\t-> Quantidade encontrada!");
 				quantidade = cifrador.descriptografar(chaveAES_GateLoja, quantidade);
@@ -747,7 +747,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			if(veiculo == null) {
 				return new Executivo("podebanir", null, null, null);
 			}
-			veiculo = stubReplicas.buscarVeiculoPorRenavam(msgPrivadaLoja, veiculo.getRenavam());
+			veiculo = stubReplicas.buscarVeiculoPorRenavam(nomeCliente, msgPrivadaLoja, veiculo.getRenavam());
 			if (veiculo == null) {
 				System.out.println("\t\t-> Veículo não encontrada!");
 				return null;
