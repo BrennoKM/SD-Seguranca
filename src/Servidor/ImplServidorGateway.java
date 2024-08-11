@@ -626,6 +626,7 @@ public class ImplServidorGateway implements ServidorGateway {
 			
 			String msgPrivada = cifrador.criptografar(chaveAES_GateLoja, mensagemPrivada);
 			List<Veiculo> veiculoBusca = stubReplicas.getVeiculos(nomeCliente, msgPrivada);
+			System.out.println("\u001B[32mNome enviado ao stubreplicas: \u001B[0m" + nomeCliente);
 			if (veiculoBusca != null) {
 				System.out.println("\t\t-> Veiculo(s) encontrado(s)!");
 				for (Veiculo veiculo : veiculoBusca) {

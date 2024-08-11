@@ -1,9 +1,12 @@
 package Servidor;
 
+import java.nio.charset.StandardCharsets;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,16 +23,24 @@ public class ImplReplicasControl implements ServidorLoja {
 	private Map<Integer, ServidorLoja> mapLojas = new HashMap<>();
 	private ExecutorService executor;
 	private int roundRobinIndex = 0;
+	private SortedMap<Integer, Integer> anelMap = new TreeMap<>();
+	private String[] hostsLojas;
+	private int[] portasLojas;
+
 
 	public ImplReplicasControl(String[] hostsLojas, int[] portasLojas) throws Exception {
 		executor = Executors.newFixedThreadPool(hostsLojas.length);
-
+		this.hostsLojas = hostsLojas;
+		this.portasLojas = portasLojas;
 		for (int i = 0; i < hostsLojas.length; i++) {
 
 			final int index = i;
+			int indice = index;
 			Runnable conectar = () -> {
 				try {
 					abrirServidorLoja(index, hostsLojas[index], portasLojas[index]);
+					int hash = hash(hostsLojas[indice] + ":" + portasLojas[indice]);
+					anelMap.put(hash, indice);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -47,6 +58,16 @@ public class ImplReplicasControl implements ServidorLoja {
 //			thread.start();
 		}
 
+	}
+
+	private int hash(String key) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] hashBytes = md.digest(key.getBytes(StandardCharsets.UTF_8));
+			return Math.abs(new String(hashBytes, StandardCharsets.UTF_8).hashCode());
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static void config(String host) {
@@ -105,6 +126,8 @@ public class ImplReplicasControl implements ServidorLoja {
 					if (i == indice) {
 						iterator.remove();
 						mapLojas.remove(i);
+						int hash = hash(hostsLojas[indice] + ":" + portasLojas[indice]);
+						anelMap.remove(hash);
 					}
 				}
 //				e.printStackTrace();
@@ -185,27 +208,29 @@ public class ImplReplicasControl implements ServidorLoja {
 //	}
 
 	// rount robin
+//	public ServidorLoja getStubRead(String key) {
+//		int startIndex = (roundRobinIndex++) % indices.size();
+//		for (int i = 0; i < indices.size(); i++) {
+//			int currentIndex = (startIndex + i) % indices.size();
+//			ServidorLoja stub = testarLoja(indices.get(currentIndex));
+//			if (stub == null) {
+//				stub = getStubRead(key);
+//			}
+//			return stub;
+//		}
+//		return null;
+//	}
+
+	// consistent hashing
 	public ServidorLoja getStubRead(String key) {
-		int startIndex = (roundRobinIndex++) % indices.size();
-		for (int i = 0; i < indices.size(); i++) {
-			int currentIndex = (startIndex + i) % indices.size();
-			ServidorLoja stub = testarLoja(indices.get(currentIndex));
-			if (stub == null) {
-				stub = getStubRead(key);
-			}
-			return stub;
+		if (anelMap.isEmpty()) {
+			return null;
 		}
-		return null;
-	}
-	public ServidorLoja getStubReadConsistentHashing(String key) {
-		for (int i : indices) {
-			ServidorLoja stub = testarLoja(i);
-			if (stub == null) {
-				stub = getStubRead(key);
-			}
-			return stub;
-		}
-		return null;
+		int hash = hash(key);
+		SortedMap<Integer, Integer> tailMap = anelMap.tailMap(hash);
+		int targetHash = tailMap.isEmpty() ? anelMap.firstKey() : tailMap.firstKey();
+		int targetIndex = anelMap.get(targetHash);
+		return testarLoja(targetIndex);
 	}
 
 	public ServidorLoja getStubWrite() {
