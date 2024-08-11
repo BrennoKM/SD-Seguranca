@@ -101,15 +101,15 @@ public class ImplReplicasControl implements ServidorLoja {
 //				System.out.println("exception eleição");
 				Iterator<Integer> iterator = indices.iterator();
 				while (iterator.hasNext()) {
-				    int i = iterator.next();
-				    if (i == indice) {
-				        iterator.remove();
-				        mapLojas.remove(i);
-				    }
+					int i = iterator.next();
+					if (i == indice) {
+						iterator.remove();
+						mapLojas.remove(i);
+					}
 				}
 //				e.printStackTrace();
 				return elegerLider();
-				
+
 			}
 
 		}
@@ -141,26 +141,63 @@ public class ImplReplicasControl implements ServidorLoja {
 		} catch (Exception e) {
 			Iterator<Integer> iterator = indices.iterator();
 			while (iterator.hasNext()) {
-			    int i = iterator.next();
-			    if (i == indice) {
-			        iterator.remove();
-			        mapLojas.remove(i);
-			    }
+				int i = iterator.next();
+				if (i == indice) {
+					iterator.remove();
+					mapLojas.remove(i);
+				}
 			}
-			
+
 			if (indice == this.indiceLider) {
 				this.indiceLider = -1;
 				elegerLider();
 			}
 //			e.printStackTrace();
 			return testarLoja(indices.get(0));
-			
+
 		}
 	}
 
 
 	// original
+//	public ServidorLoja getStubRead(String key) {
+//		for (int i : indices) {
+//			ServidorLoja stub = testarLoja(i);
+//			if (stub == null) {
+//				stub = getStubRead(key);
+//			}
+//			return stub;
+//		}
+//		return null;
+//	}
+
+	// Random
+//	public ServidorLoja getStubRead(String key) {
+//		List<Integer> shuffledIndices = new ArrayList<>(indices);
+//		Collections.shuffle(shuffledIndices);
+//		for (int i : shuffledIndices) {
+//			ServidorLoja stub = testarLoja(i);
+//			if (stub != null) {
+//				return stub;
+//			}
+//		}
+//		return null;
+//	}
+
+	// rount robin
 	public ServidorLoja getStubRead(String key) {
+		int startIndex = (roundRobinIndex++) % indices.size();
+		for (int i = 0; i < indices.size(); i++) {
+			int currentIndex = (startIndex + i) % indices.size();
+			ServidorLoja stub = testarLoja(indices.get(currentIndex));
+			if (stub == null) {
+				stub = getStubRead(key);
+			}
+			return stub;
+		}
+		return null;
+	}
+	public ServidorLoja getStubReadConsistentHashing(String key) {
 		for (int i : indices) {
 			ServidorLoja stub = testarLoja(i);
 			if (stub == null) {
@@ -170,8 +207,6 @@ public class ImplReplicasControl implements ServidorLoja {
 		}
 		return null;
 	}
-
-
 
 	public ServidorLoja getStubWrite() {
 		ServidorLoja stub = testarLoja(this.indiceLider);
