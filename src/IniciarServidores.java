@@ -24,11 +24,15 @@ public class IniciarServidores{
 //		new IniciarServidorLoja(hostLoja, portaInicial+0, "veiculos.ser");
 //		new IniciarServidorLoja(hostLoja, portaInicial+1, "veiculos1.ser");
 //		new IniciarServidorLoja(hostLoja, portaInicial+2, "veiculos2.ser");
-
+//
+//		new IniciarReplicasControl(hostReplicas, hostsLojas, portasLojas, portaInicial);
 		new IniciarServidorAutentificacao(hostAuth, portaInicial);
-		new IniciarReplicasControl(hostReplicas, hostsLojas, portasLojas, portaInicial);
+//
+//
 		new IniciarServidorGateway(hostFirewall, hostGateway, hostAuth, hostReplicas, portaInicial);
 		new IniciarFirewall(hostFirewall, hostGateway, portaInicial);
 
+
 	}
+
 }

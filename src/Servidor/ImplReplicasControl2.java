@@ -1,5 +1,6 @@
 package Servidor;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -17,7 +18,7 @@ import Modelos.Veiculo;
 import Modelos.Veiculo.Categoria;
 import ServidorInterface.ServidorLoja;
 
-public class ImplReplicasControl implements ServidorLoja {
+public class ImplReplicasControl2 implements ServidorLoja {
 
 	private boolean escrevendo = false;
 	private int indiceLider = -1;
@@ -29,9 +30,10 @@ public class ImplReplicasControl implements ServidorLoja {
 	private String[] hostsLojas;
 	private int[] portasLojas;
 
-	private static final int NUM_REPLICAS = 10;
 
-	public ImplReplicasControl(String[] hostsLojas, int[] portasLojas) throws Exception {
+	private static final int NUM_REPLICAS = 3; // Número de réplicas virtuais por loja
+
+	public ImplReplicasControl2(String[] hostsLojas, int[] portasLojas) throws Exception {
 		CyclicBarrier barreira = new CyclicBarrier(hostsLojas.length, () -> {
 			System.out.println("\u001B[32mTodas as chaves: " + anelMap.keySet() + "\u001B[0m");
 			elegerLider();
@@ -41,39 +43,36 @@ public class ImplReplicasControl implements ServidorLoja {
 		this.hostsLojas = hostsLojas;
 		this.portasLojas = portasLojas;
 		for (int i = 0; i < hostsLojas.length; i++) {
-
 			final int index = i;
 			int indice = index;
 			Runnable conectar = () -> {
 				try {
-					abrirServidorLoja(barreira, index, hostsLojas[index], portasLojas[index]);
-
-
-
+					abrirServidorLoja(index, hostsLojas[index], portasLojas[index]);
+					List<Integer> addedHashes = new ArrayList<>();
+					synchronized (anelMap) {
+						for (int j = 0; j < NUM_REPLICAS; j++) {
+							int hash = hash(hostsLojas[indice] + ":" + portasLojas[indice] + ":" + j);
+							anelMap.put(hash, indice);
+							addedHashes.add(hash);
+						}
+					}
+					System.out.println("\u001B[32mLoja adicionada " + index + " com Hashes: " + addedHashes + "\u001B[0m");
+					await(barreira);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			};
 			executor.execute(conectar);
-//			System.out.println("\u001B[32mLoja adicionada " + index + "\u001B[0m");
 
-//			Thread thread = new Thread(() -> {
-//				try {
-//					abrirServidorLoja(index, hostsLojas[index], portasLojas[index]);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			});
-//			thread.start();
 		}
-
 	}
 
 	private int hash(String key) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			byte[] hashBytes = md.digest(key.getBytes(StandardCharsets.UTF_8));
-			return Math.abs(new String(hashBytes, StandardCharsets.UTF_8).hashCode());
+			BigInteger bigInt = new BigInteger(1, hashBytes);
+			return bigInt.mod(BigInteger.valueOf(Integer.MAX_VALUE)).intValue();
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException(e);
 		}
@@ -97,7 +96,7 @@ public class ImplReplicasControl implements ServidorLoja {
 		 */
 	}
 
-	private void abrirServidorLoja(CyclicBarrier barreira, int indice, String host, int porta) throws Exception {
+	private void abrirServidorLoja(int indice, String host, int porta) throws Exception {
 //		porta = porta + 2;
 		config(host);
 		Scanner entrada = new Scanner(System.in);
@@ -113,22 +112,12 @@ public class ImplReplicasControl implements ServidorLoja {
 				mapLojas.put(indice, stubLoja);
 				indices.add(indice);
 				System.out.println(stubLoja.testarConexao());
-				List<Integer> addedHashes = new ArrayList<>();
-				synchronized (anelMap) {
-					for (int j = 0; j < NUM_REPLICAS; j++) {
-						int hash = hash(hostsLojas[indice] + ":" + portasLojas[indice] + ":" + j);
-						anelMap.put(hash, indice);
-						addedHashes.add(hash);
-					}
-				}
-				System.out.println("\u001B[32mLoja adicionada " + indice + " com Hashes: " + addedHashes + "\u001B[0m");
-				await(barreira);
-//				System.out.println("Loja adicionada " + indice);
-//				System.out.println(indices);
+				System.out.println("Loja adicionada " + indice);
+				System.out.println(indices);
 				conectou = true;
 				entrada.close();
 			} catch (RemoteException | NotBoundException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 				System.err.println("Falha ao se conectar com o servidor de veiculos. Tentando novamente em 4 segundos");
 				Thread.sleep(4000);
 			}
@@ -142,93 +131,63 @@ public class ImplReplicasControl implements ServidorLoja {
 			try {
 				if (stubLoja.testarConexao()) {
 					this.indiceLider = indice;
-//					System.out.println("novo lider " + indice);
 					return stubLoja;
 				}
-//				System.out.println("novo lider não encontrado, tentando novamente...");
 				return elegerLider();
 			} catch (Exception e) {
-//				System.out.println("exception eleição");
-				Iterator<Integer> iterator = indices.iterator();
-				while (iterator.hasNext()) {
-					int i = iterator.next();
-					if (i == indice) {
-						iterator.remove();
-						mapLojas.remove(i);
-
-
-						removerHashes(indice);
-
-					}
-				}
-				e.printStackTrace();
+//				e.printStackTrace();
+//				System.out.println("\u001B[31mIndo remover loja: " + indice + "\u001B[0m");
+//				removerServidor(indice);
 				return elegerLider();
-
 			}
-
 		}
 		return null;
 	}
 
-	private void removerHashes(int indice) {
-		synchronized (anelMap) {
-			Set<Map.Entry<Integer, Integer>> entrySet = anelMap.entrySet();
-			List<Integer> keysToRemove = new ArrayList<>();
-			entrySet.forEach(entryanel -> {
-//						System.out.println("for each iteração: " + entry.getKey() + " " + entry.getValue());
-				if (entryanel.getValue() == indice) {
-					System.out.println("\u001B[31mRemovendo chave: " + entryanel.getKey() + " com valor: " + entryanel.getValue() + " \u001B[0m");
-					keysToRemove.add(entryanel.getKey());
-				}
-			});
-			keysToRemove.forEach(chave -> anelMap.remove(chave));
-			System.out.println("\u001B[32mTodas as chaves: " + anelMap.keySet() + "\u001B[0m");
+	private ServidorLoja testarLoja(int indice) {
+		try {
+			ServidorLoja stubLoja = mapLojas.get(indice);
+			if (stubLoja != null && stubLoja.testarConexao()) {
+				return stubLoja;
+			}
+
+			if (indice == this.indiceLider) {
+				this.indiceLider = -1;
+				elegerLider();
+			}
+			return testarLoja(indices.get(0));
+		} catch (Exception e) {
+
+			removerServidor(indice);
+			if (indice == this.indiceLider) {
+				this.indiceLider = -1;
+				elegerLider();
+			}
+			return testarLoja(indices.get(0));
 		}
 	}
 
-	private ServidorLoja testarLoja(int indice) {
-		try {
-//			System.out.println("Testando " + indice);
-			ServidorLoja stubLoja = mapLojas.get(indice);
-			if (stubLoja != null && stubLoja.testarConexao()) {
-//				System.out.println("loja funciona " + indice);
-				return stubLoja;
-			}
-//			System.out.println("não funcionou");
-			for(int i : indices) {
-				if(i == indice) {
-//					System.out.println("loja não funciona removendo " + indice);
-					indices.remove(i);
-					mapLojas.remove(i);
-
-					removerHashes(indice);
+	private void removerServidor(int indice) {
+		Iterator<Integer> iterator = indices.iterator();
+		while (iterator.hasNext()) {
+			int i = iterator.next();
+			if (i == indice) {
+				iterator.remove();
+				mapLojas.remove(i);
+				synchronized (anelMap) {
+					Set<Map.Entry<Integer, Integer>> entrySet = anelMap.entrySet();
+					List<Integer> keysToRemove = new ArrayList<>();
+					entrySet.forEach(entry -> {
+//						System.out.println("for each iteração: " + entry.getKey() + " " + entry.getValue());
+						if (entry.getValue() == indice) {
+							System.out.println("\u001B[31mRemovendo chave: " + entry.getKey() + " com valor: " + entry.getValue() + " \u001B[0m");
+							keysToRemove.add(entry.getKey());
+						}
+					});
+					keysToRemove.forEach(chave -> anelMap.remove(chave));
+					System.out.println("\u001B[32mTodas as chaves: " + anelMap.keySet() + "\u001B[0m");
 				}
 			}
-			if (indice == this.indiceLider) {
-				this.indiceLider = -1;
-				elegerLider();
-			}
-//			System.out.println("indo testar nova loja " + indices.get(0));
-			return testarLoja(indices.get(0));
-		} catch (Exception e) {
-			Iterator<Integer> iterator = indices.iterator();
-			while (iterator.hasNext()) {
-				int i = iterator.next();
-				if (i == indice) {
-					iterator.remove();
-					mapLojas.remove(i);
-
-					removerHashes(indice);
-				}
-			}
-
-			if (indice == this.indiceLider) {
-				this.indiceLider = -1;
-				elegerLider();
-			}
-//			e.printStackTrace();
-			return testarLoja(indices.get(0));
-
 		}
 	}
 
@@ -283,7 +242,10 @@ public class ImplReplicasControl implements ServidorLoja {
 		SortedMap<Integer, Integer> tailMap = anelMap.tailMap(hash);
 		int targetHash = tailMap.isEmpty() ? anelMap.firstKey() : tailMap.firstKey();
 		int targetIndex = anelMap.get(targetHash);
-
+		System.out.println("first key anel: " + anelMap.firstKey());
+		System.out.println("first key tail: " + (tailMap.isEmpty() ? "Vazio" : tailMap.firstKey()));
+		System.out.println("targetHash escolhido: " + targetHash);
+		System.out.println("targetIndex escolhido: " + targetIndex);
 
 		ServidorLoja stub = testarLoja(targetIndex);
 		if (stub == null) {
@@ -292,10 +254,6 @@ public class ImplReplicasControl implements ServidorLoja {
 			}
 			return getStubRead(key);
 		}
-		System.out.println("first key anel: " + anelMap.firstKey());
-		System.out.println("first key tail: " + (tailMap.isEmpty() ? "Vazio" : tailMap.firstKey()));
-		System.out.println("targetHash escolhido: " + targetHash);
-		System.out.println("targetIndex escolhido: " + targetIndex);
 		return stub;
 	}
 
@@ -441,7 +399,7 @@ public class ImplReplicasControl implements ServidorLoja {
 	}
 
 	public boolean testarConexao() throws RemoteException, Exception {
-//		elegerLider();
+
 		return true;
 	}
 

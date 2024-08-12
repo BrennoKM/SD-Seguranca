@@ -4,6 +4,8 @@ public class IniciarCliente extends IniciarServidores{
 	public static void main(String[] args) throws Exception {
 		// inserir clientes do gateway com nomes diferentes
 		// host do servidorGateway
-		new Cliente("Kevyn", hostFirewall, portaInicial-1);
+		String nome = hostsLojas[0] + ":" + (portaInicial+2) + ":" + 0;
+//		new Cliente("Kevyn", hostFirewall, portaInicial-1);
+		new Cliente("Caio", hostFirewall, portaInicial-1);
 	}
 }
