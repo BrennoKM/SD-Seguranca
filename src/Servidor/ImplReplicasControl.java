@@ -43,23 +43,21 @@ public class ImplReplicasControl implements ServidorLoja {
 		for (int i = 0; i < hostsLojas.length; i++) {
 
 			final int index = i;
-			int indice = index;
 			Runnable conectar = () -> {
 				try {
 					abrirServidorLoja(barreira, index, hostsLojas[index], portasLojas[index]);
-
-
 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			};
 			executor.execute(conectar);
+
 //			System.out.println("\u001B[32mLoja adicionada " + index + "\u001B[0m");
 
 //			Thread thread = new Thread(() -> {
 //				try {
-//					abrirServidorLoja(index, hostsLojas[index], portasLojas[index]);
+//					abrirServidorLoja(barreira, index, hostsLojas[index], portasLojas[index]);
 //				} catch (Exception e) {
 //					e.printStackTrace();
 //				}
@@ -108,11 +106,16 @@ public class ImplReplicasControl implements ServidorLoja {
 		while (!conectou) {
 			try {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
-
+				System.out.println(registro.toString());
+				System.out.println("host: " + host + " porta: " + porta);
 				ServidorLoja stubLoja = (ServidorLoja) registro.lookup("rmi://" + host + "/ServidorLoja");
+
+
+				System.out.println("pre testar conexao");
+				System.out.println(stubLoja.testarConexao());
+				System.out.println("pos testar conexao");
 				mapLojas.put(indice, stubLoja);
 				indices.add(indice);
-				System.out.println(stubLoja.testarConexao());
 				List<Integer> addedHashes = new ArrayList<>();
 				synchronized (anelMap) {
 					for (int j = 0; j < NUM_REPLICAS; j++) {
@@ -122,11 +125,12 @@ public class ImplReplicasControl implements ServidorLoja {
 					}
 				}
 				System.out.println("\u001B[32mLoja adicionada " + indice + " com Hashes: " + addedHashes + "\u001B[0m");
-				await(barreira);
-//				System.out.println("Loja adicionada " + indice);
-//				System.out.println(indices);
+
+				System.out.println("Loja adicionada " + indice);
+				System.out.println(indices);
 				conectou = true;
 				entrada.close();
+				await(barreira);
 			} catch (RemoteException | NotBoundException e) {
 				e.printStackTrace();
 				System.err.println("Falha ao se conectar com o servidor de veiculos. Tentando novamente em 4 segundos");
@@ -209,7 +213,8 @@ public class ImplReplicasControl implements ServidorLoja {
 				elegerLider();
 			}
 //			System.out.println("indo testar nova loja " + indices.get(0));
-			return testarLoja(indices.get(0));
+//			return testarLoja(indices.get(0));
+			return null;
 		} catch (Exception e) {
 			Iterator<Integer> iterator = indices.iterator();
 			while (iterator.hasNext()) {
@@ -227,8 +232,8 @@ public class ImplReplicasControl implements ServidorLoja {
 				elegerLider();
 			}
 //			e.printStackTrace();
-			return testarLoja(indices.get(0));
-
+//			return testarLoja(indices.get(0));
+			return null;
 		}
 	}
 
@@ -273,7 +278,7 @@ public class ImplReplicasControl implements ServidorLoja {
 //	}
 
 	// consistent hashing
-	public ServidorLoja getStubRead(String key) {
+	public ServidorLoja getStubRead(String key) throws Exception {
 		if (anelMap.isEmpty()) {
 			return null;
 		}
@@ -284,12 +289,8 @@ public class ImplReplicasControl implements ServidorLoja {
 		int targetHash = tailMap.isEmpty() ? anelMap.firstKey() : tailMap.firstKey();
 		int targetIndex = anelMap.get(targetHash);
 
-
 		ServidorLoja stub = testarLoja(targetIndex);
 		if (stub == null) {
-			synchronized (anelMap) {
-				anelMap.remove(targetHash);
-			}
 			return getStubRead(key);
 		}
 		System.out.println("first key anel: " + anelMap.firstKey());
@@ -297,6 +298,7 @@ public class ImplReplicasControl implements ServidorLoja {
 		System.out.println("targetHash escolhido: " + targetHash);
 		System.out.println("targetIndex escolhido: " + targetIndex);
 		return stub;
+
 	}
 
 	public ServidorLoja getStubWrite() {
