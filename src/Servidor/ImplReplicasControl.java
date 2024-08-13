@@ -106,14 +106,14 @@ public class ImplReplicasControl implements ServidorLoja {
 		while (!conectou) {
 			try {
 				Registry registro = LocateRegistry.getRegistry(host, porta);
-				System.out.println(registro.toString());
-				System.out.println("host: " + host + " porta: " + porta);
+//				System.out.println(registro.toString());
+//				System.out.println("host: " + host + " porta: " + porta);
 				ServidorLoja stubLoja = (ServidorLoja) registro.lookup("rmi://" + host + "/ServidorLoja");
 
 
-				System.out.println("pre testar conexao");
+//				System.out.println("pre testar conexao");
 				System.out.println(stubLoja.testarConexao());
-				System.out.println("pos testar conexao");
+//				System.out.println("pos testar conexao");
 				mapLojas.put(indice, stubLoja);
 				indices.add(indice);
 				List<Integer> addedHashes = new ArrayList<>();
@@ -132,7 +132,7 @@ public class ImplReplicasControl implements ServidorLoja {
 				entrada.close();
 				await(barreira);
 			} catch (RemoteException | NotBoundException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				System.err.println("Falha ao se conectar com o servidor de veiculos. Tentando novamente em 4 segundos");
 				Thread.sleep(4000);
 			}
